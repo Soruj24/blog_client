@@ -1,69 +1,110 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+import { FeaturedSection } from "@/src/components/home/FeaturedSection";
+import { HeroSection } from "@/src/components/home/HeroSection";
+import { LatestSection } from "@/src/components/home/LatestSection";
+
+const TrendingSection = dynamic(
+  () => import("@/src/components/home/TrendingSection").then((m) => m.TrendingSection),
+  {
+    loading: () => (
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+        <div className="mt-8 space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const CategoriesSection = dynamic(
+  () => import("@/src/components/home/CategoriesSection").then((m) => m.CategoriesSection),
+  {
+    loading: () => (
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-900" />
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
+
+const EditorsPicksSection = dynamic(
+  () => import("@/src/components/home/EditorsPicksSection").then((m) => m.EditorsPicksSection)
+);
+
+const AuthorsSection = dynamic(
+  () => import("@/src/components/home/AuthorsSection").then((m) => m.AuthorsSection)
+);
+
+const NewsletterSection = dynamic(
+  () => import("@/src/components/home/NewsletterSection").then((m) => m.NewsletterSection)
+);
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: { absolute: "Inkwell — Ideas worth reading slowly" },
+  description:
+    "Long-form essays and field notes on technology, design, and culture. Discover featured stories, trending reads, top authors, and weekly insights.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    title: "Inkwell — Ideas worth reading slowly",
+    description:
+      "Long-form essays and field notes on technology, design, and culture.",
+    url: "/",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Inkwell" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Inkwell — Ideas worth reading slowly",
+    description:
+      "Long-form essays and field notes on technology, design, and culture.",
+  },
+};
+
+/** WebSite schema with sitelinks search — helps SEO, zero UI cost. */
+function HomepageJsonLd() {
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Inkwell",
+    url: siteUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteUrl}/search?q={query}`,
+      "query-input": "required name=query",
+    },
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="pb-20">
+      <HomepageJsonLd />
+      <HeroSection />
+      <FeaturedSection />
+      <LatestSection />
+      <TrendingSection />
+      <CategoriesSection />
+      <EditorsPicksSection />
+      <AuthorsSection />
+      <NewsletterSection />
     </div>
   );
 }
