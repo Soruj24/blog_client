@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import {
+  ArrowUp,
   BarChart3,
   ChevronRight,
   FileText,
@@ -82,7 +83,7 @@ function NavLinks({ onNavigate, pathname }: { onNavigate?: () => void; pathname:
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cx(
-                      "group flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-150",
+                      "group flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors duration-150",
                       focusRing,
                       active
                         ? "bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900"
@@ -186,12 +187,49 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const close = useCallback(() => setOpen(false), []);
 
+  // Close mobile drawer on route change
+  const prevPathname = useRef(pathname);
   useEffect(() => {
-    close();
-  }, [pathname, close]);
+    if (prevPathname.current !== pathname) {
+      setOpen(false);
+      prevPathname.current = pathname;
+    }
+  }, [pathname]);
+
+  // Scroll progress + scroll-to-top visibility
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const { scrollTop, scrollHeight, clientHeight } = el;
+          const maxScroll = scrollHeight - clientHeight;
+          const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+          setScrollProgress(progress);
+          setShowScrollTop(scrollTop > 300);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Focus trap + escape + body scroll lock
   useEffect(() => {
@@ -236,16 +274,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [open, close]);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:flex lg:gap-10">
-      {/* ------------------------------------------------------------------ */}
-      {/*  Desktop sidebar                                                     */}
-      {/* ------------------------------------------------------------------ */}
-      <aside className="hidden w-56 shrink-0 lg:block" aria-label="Admin navigation">
-        <div className="sticky top-24">
-          <Link
-            href="/admin"
-            className="flex items-center gap-2.5 px-3 pb-4 pt-1"
-          >
+    <div className="admin-shell flex h-screen flex-col overflow-hidden lg:flex-row">
+      {/* ── Scroll progress indicator ──────────────────────────────── */}
+      <div
+        className="scroll-progress"
+        style={{ width: `${scrollProgress}%` }}
+        aria-hidden
+      />
+
+      {/* ── Desktop sidebar ────────────────────────────────────────── */}
+      <aside
+        className="admin-sidebar hidden w-64 shrink-0 border-r border-zinc-200 bg-white lg:flex lg:flex-col dark:border-zinc-800 dark:bg-zinc-950"
+        aria-label="Admin navigation"
+      >
+        <div className="flex h-14 items-center gap-2.5 border-b border-zinc-200 px-5 dark:border-zinc-800">
+          <Link href="/admin" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-100">
               <Newspaper className="h-4 w-4 text-white dark:text-zinc-900" aria-hidden />
             </div>
@@ -258,22 +301,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </p>
             </div>
           </Link>
+        </div>
+        <div className="flex-1 overflow-y-auto px-3 py-4 admin-scroll">
           <NavLinks pathname={pathname} />
         </div>
       </aside>
 
-      {/* ------------------------------------------------------------------ */}
-      {/*  Mobile drawer                                                       */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ── Mobile drawer ──────────────────────────────────────────── */}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden" ref={drawerRef}>
-          {/* Backdrop */}
           <div
             aria-hidden
             onClick={close}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           />
-          {/* Panel */}
           <div
             role="dialog"
             aria-modal="true"
@@ -301,24 +342,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <X className="h-4 w-4" aria-hidden />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-3 py-4">
+            <div className="flex-1 overflow-y-auto px-3 py-4 admin-scroll">
               <NavLinks pathname={pathname} />
             </div>
           </div>
         </div>
       )}
 
-      {/* ------------------------------------------------------------------ */}
-      {/*  Main content                                                        */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="min-w-0 flex-1">
-        <div className="mb-6 flex items-center gap-3">
+      {/* ── Main content area ──────────────────────────────────────── */}
+      <div className="admin-main flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Mobile header bar */}
+        <div className="flex h-12 shrink-0 items-center gap-3 border-b border-zinc-200 px-4 lg:hidden dark:border-zinc-800">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-label="Open admin navigation"
             className={cx(
-              "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-900 lg:hidden dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+              "inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
               focusRing,
             )}
           >
@@ -326,8 +366,33 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
           <Breadcrumbs pathname={pathname} />
         </div>
-        {children}
+
+        {/* Desktop breadcrumbs */}
+        <div className="hidden h-12 shrink-0 items-center border-b border-zinc-200 px-6 lg:flex dark:border-zinc-800">
+          <Breadcrumbs pathname={pathname} />
+        </div>
+
+        {/* Scrollable page content */}
+        <div
+          ref={mainRef}
+          className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 admin-scroll"
+        >
+          {children}
+        </div>
       </div>
+
+      {/* ── Scroll to top button ───────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+        className={cx(
+          "scroll-top-btn fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white shadow-lg transition-all hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300",
+          showScrollTop && "visible",
+        )}
+      >
+        <ArrowUp className="h-4 w-4" aria-hidden />
+      </button>
     </div>
   );
 }

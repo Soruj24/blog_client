@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/src/app-providers";
-import { SiteHeader } from "@/src/components/layout/SiteHeader";
-import { SiteFooter } from "@/src/components/layout/SiteFooter";
 import { defaultMetadata } from "@/src/lib/seo";
+import { LayoutShell } from "@/src/components/layout/LayoutShell";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap", preload: true });
 const geistMono = Geist_Mono({
@@ -48,11 +47,7 @@ export default function RootLayout({
           >
             Skip to content
           </a>
-          <SiteHeader />
-          <main id="main-content" className="flex flex-1 flex-col">
-            {children}
-          </main>
-          <SiteFooter />
+          <LayoutShell>{children}</LayoutShell>
         </AppProviders>
       </body>
     </html>

@@ -115,7 +115,7 @@ export function BulkBar({
     <div
       role="toolbar"
       aria-label="Bulk actions"
-      className="sticky bottom-4 z-30 mx-auto flex w-fit max-w-[calc(100vw-2rem)] flex-col items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-5 py-3 shadow-xl shadow-zinc-900/5 sm:flex-row sm:gap-4 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-zinc-950/20"
+      className="sticky bottom-4 z-30 mx-auto flex w-fit max-w-full flex-col items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-5 py-3 shadow-xl shadow-zinc-900/5 sm:flex-row sm:gap-4 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-zinc-950/20"
     >
       <div className="flex items-center gap-3">
         <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-zinc-900 px-2 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
