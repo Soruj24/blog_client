@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ExternalLink,
   MoreHorizontal,
@@ -20,6 +20,7 @@ import { Skeleton } from "@/src/components/ui/Skeleton";
 import { Badge } from "@/src/components/ui/Badge";
 import { Card } from "@/src/components/ui/Card";
 import { Checkbox } from "@/src/components/ui/checkbox";
+import { useToast } from "@/src/components/ui/Toast";
 import {
   Table,
   TableBody,
@@ -69,61 +70,23 @@ const STATUS_OPTIONS = [
 
 function PostsSkeleton() {
   return (
-    <div className="space-y-4" aria-label="Loading posts">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-20 !rounded-xl" />
-        ))}
-      </div>
-      <Skeleton className="h-14 !rounded-xl" />
+    <div className="space-y-4" role="status" aria-label="Loading posts">
+      <Skeleton className="h-16 rounded-2xl" />
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 rounded-xl border border-zinc-200/60 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950">
-          <Skeleton className="h-10 w-10 shrink-0 !rounded-lg" />
+          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-1/3 !rounded-md" />
-            <Skeleton className="h-3 w-1/5 !rounded-md" />
+            <Skeleton className="h-4 w-1/3 rounded-md" />
+            <Skeleton className="h-3 w-1/5 rounded-md" />
           </div>
-          <Skeleton className="h-6 w-16 !rounded-full" />
-          <Skeleton className="hidden h-4 w-12 !rounded-md sm:block" />
-          <Skeleton className="hidden h-4 w-12 !rounded-md sm:block" />
-          <Skeleton className="h-4 w-20 !rounded-md" />
-          <Skeleton className="h-8 w-8 !rounded-lg" />
+          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="hidden h-4 w-12 rounded-md sm:block" />
+          <Skeleton className="hidden h-4 w-12 rounded-md sm:block" />
+          <Skeleton className="h-4 w-20 rounded-md" />
+          <Skeleton className="h-8 w-8 rounded-lg" />
         </div>
       ))}
     </div>
-  );
-}
-
-/* ── Quick stat card ─────────────────────────────────────────── */
-
-function StatChip({
-  label,
-  value,
-  active,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left transition-all ${
-        active
-          ? "border-zinc-900 bg-zinc-900 text-white shadow-sm dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-          : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
-      }`}
-    >
-      <span className={`text-lg font-bold tabular-nums ${active ? "" : "text-zinc-900 dark:text-zinc-100"}`}>
-        {compact(value)}
-      </span>
-      <span className={`text-xs font-medium ${active ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"}`}>
-        {label}
-      </span>
-    </button>
   );
 }
 
@@ -135,6 +98,7 @@ export function PostsManager() {
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
   const [confirming, setConfirming] = useState<BulkAction | null>(null);
+  const { toast } = useToast();
 
   const { data, isLoading, isError, refetch } = useAdminPostsQuery({
     page,
@@ -148,14 +112,7 @@ export function PostsManager() {
   const allSelected = rowIds.length > 0 && rowIds.every((id) => sel.selected.has(id));
   const someSelected = sel.count > 0 && !allSelected;
 
-  const stats = useMemo(() => {
-    if (!data) return null;
-    const counts: Record<string, number> = { published: 0, draft: 0, scheduled: 0, archived: 0 };
-    for (const p of data.items) {
-      if (counts[p.status] !== undefined) counts[p.status]++;
-    }
-    return { total: data.total, ...counts } as { total: number; published: number; draft: number; scheduled: number; archived: number };
-  }, [data]);
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
 
   const applySearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,6 +144,7 @@ export function PostsManager() {
       setConfirming(null);
     } catch {
       setConfirming(null);
+      toast("Bulk action failed — please try again.", { tone: "error" });
     }
   };
 
@@ -206,45 +164,9 @@ export function PostsManager() {
         }
       />
 
-      {/* ── Quick stats ───────────────────────────────────────── */}
-      {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 !rounded-xl" />
-          ))}
-        </div>
-      ) : stats ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatChip
-            label="Published"
-            value={stats.published}
-            active={status === "published"}
-            onClick={() => changeStatus(status === "published" ? "" : "published")}
-          />
-          <StatChip
-            label="Drafts"
-            value={stats.draft}
-            active={status === "draft"}
-            onClick={() => changeStatus(status === "draft" ? "" : "draft")}
-          />
-          <StatChip
-            label="Scheduled"
-            value={stats.scheduled}
-            active={status === "scheduled"}
-            onClick={() => changeStatus(status === "scheduled" ? "" : "scheduled")}
-          />
-          <StatChip
-            label="Archived"
-            value={stats.archived}
-            active={status === "archived"}
-            onClick={() => changeStatus(status === "archived" ? "" : "archived")}
-          />
-        </div>
-      ) : null}
-
       {/* ── Filters ───────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/60 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950 sm:flex-row sm:items-center">
-        <form onSubmit={applySearch} className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="rounded-2xl border border-zinc-200/60 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950">
+        <form onSubmit={applySearch} className="flex flex-col gap-2.5 sm:flex-row sm:items-center" role="search" aria-label="Filter posts">
           <div className="relative flex-1">
             <Search
               aria-hidden
@@ -258,56 +180,76 @@ export function PostsManager() {
               className="h-9 pl-9"
             />
           </div>
-          <Select
-            value={status}
-            onChange={(e) => changeStatus(e.target.value)}
-            aria-label="Filter by status"
-            className="h-9 sm:w-40"
-            options={STATUS_OPTIONS}
-          />
-          <Button type="submit" variant="secondary" size="sm" className="h-9">
-            Search
-          </Button>
+          <div className="flex gap-2.5">
+            <div className="flex-1 sm:w-44 sm:flex-none">
+              <Select
+                size="sm"
+                value={status}
+                onChange={(e) => changeStatus(e.target.value)}
+                aria-label="Filter by status"
+                options={STATUS_OPTIONS}
+              />
+            </div>
+            <Button type="submit" variant="secondary" size="sm" className="h-9">
+              Search
+            </Button>
+          </div>
         </form>
 
         {hasFilters && (
-          <div className="flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-800/70">
+            <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Active:</span>
             {search && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <span className="inline-flex h-7 items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 &ldquo;{search}&rdquo;
                 <button
                   type="button"
                   onClick={() => { setDraft(""); setSearch(""); setPage(1); }}
-                  className="ml-0.5 rounded-full p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full outline-none transition-colors hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700 dark:focus-visible:outline-zinc-100"
                   aria-label="Clear search"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" aria-hidden />
                 </button>
               </span>
             )}
             {status && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <span className="inline-flex h-7 items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-1.5 text-xs font-medium capitalize text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 {status}
                 <button
                   type="button"
                   onClick={() => changeStatus("")}
-                  className="ml-0.5 rounded-full p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full outline-none transition-colors hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700 dark:focus-visible:outline-zinc-100"
                   aria-label="Clear status filter"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" aria-hidden />
                 </button>
               </span>
             )}
             <button
               type="button"
               onClick={clearFilters}
-              className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="inline-flex h-7 items-center rounded-full px-2.5 text-xs font-medium text-zinc-500 underline-offset-4 outline-none transition-colors hover:text-zinc-900 hover:underline focus-visible:outline-2 focus-visible:outline-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100"
             >
               Clear all
             </button>
           </div>
         )}
       </div>
+
+      {/* ── Results meta ──────────────────────────────────────── */}
+      {data && (
+        <p aria-live="polite" className="text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
+          {data.total === 0
+            ? "No posts"
+            : `${data.total} ${data.total === 1 ? "post" : "posts"}`}
+          {status && data.total > 0 && (
+            <span> · <span className="capitalize">{status}</span></span>
+          )}
+          {search && data.total > 0 && (
+            <span> · matching &ldquo;{search}&rdquo;</span>
+          )}
+        </p>
+      )}
 
       {/* ── Table ─────────────────────────────────────────────── */}
       {isLoading ? (
@@ -331,7 +273,7 @@ export function PostsManager() {
           }
         />
       ) : (
-        <Card className="overflow-hidden border-0 p-0 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60">
+        <Card className="overflow-hidden rounded-2xl border border-zinc-200/60 p-0 shadow-sm dark:border-zinc-800/60">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-zinc-100 bg-zinc-50/80 hover:bg-zinc-50/80 dark:border-zinc-800/70 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/40">
@@ -371,9 +313,9 @@ export function PostsManager() {
                     <div className="min-w-0">
                       <Link
                         href={`/blog/${p.slug}`}
-                        className="group/link block"
+                        className="block rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
                       >
-                        <span className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600 group-hover/link:text-violet-600 dark:text-zinc-100 dark:hover:text-violet-400 dark:group-hover/link:text-violet-400 line-clamp-1">
+                        <span className="line-clamp-1 text-sm font-medium text-zinc-900 underline-offset-4 transition-colors hover:text-zinc-600 hover:underline dark:text-zinc-100 dark:hover:text-zinc-300">
                           {p.title}
                         </span>
                       </Link>
@@ -413,10 +355,10 @@ export function PostsManager() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+                          className="h-8 w-8 opacity-100 transition-opacity focus-visible:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 lg:data-[state=open]:opacity-100"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" aria-hidden />
+                          <span className="sr-only">Actions for {p.title}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
@@ -455,14 +397,14 @@ export function PostsManager() {
       )}
 
       {/* ── Pagination ────────────────────────────────────────── */}
-      {data && Math.ceil(data.total / data.limit) > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Page {page} of {Math.ceil(data.total / data.limit)}
+      {data && totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm tabular-nums text-zinc-500 dark:text-zinc-400" aria-live="polite">
+            Page {page} of {totalPages}
           </p>
           <Pagination
             page={page}
-            totalPages={Math.ceil(data.total / data.limit)}
+            totalPages={totalPages}
             onChange={(p) => {
               setPage(p);
               sel.clear();

@@ -18,9 +18,13 @@ const BOOL_FIELDS = [
 
 function SettingsSkeleton() {
   return (
-    <div className="space-y-4" aria-label="Loading settings">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className="h-40 !rounded-2xl" />
+    <div className="max-w-3xl space-y-4" role="status" aria-label="Loading settings">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48 rounded-lg" />
+        <Skeleton className="h-4 w-72 rounded-md" />
+      </div>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-44 rounded-2xl" />
       ))}
     </div>
   );
@@ -116,8 +120,8 @@ export function SettingsManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Settings" description="Site-wide configuration." />
+    <div className="max-w-3xl space-y-6">
+      <PageHeader title="Settings" description="Site-wide configuration. Changes apply immediately after saving." />
 
       <form onSubmit={save} className="space-y-6">
         <SettingsSection title="General" description="Basic site identity and branding.">
@@ -165,7 +169,7 @@ export function SettingsManager() {
         </SettingsSection>
 
         <SettingsSection title="SEO Defaults" description="Fallback meta tags when posts don't specify their own.">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-4">
             <Input
               label="Default SEO title"
               value={String(form["defaultSeoTitle"] ?? "")}
@@ -175,26 +179,28 @@ export function SettingsManager() {
               label="Default SEO description"
               value={String(form["defaultSeoDescription"] ?? "")}
               onChange={(e) => set("defaultSeoDescription", e.target.value)}
+              hint={`${String(form["defaultSeoDescription"] ?? "").length}/160 characters`}
             />
           </div>
         </SettingsSection>
 
         <SettingsSection title="Social Links" description="Displayed in the site footer and meta tags.">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-4">
             <Input
-              label="Twitter URL"
+              label="Twitter / X URL"
+              placeholder="https://x.com/…"
               value={String(form["twitterUrl"] ?? "")}
               onChange={(e) => set("twitterUrl", e.target.value)}
             />
             <Input
               label="GitHub URL"
+              placeholder="https://github.com/…"
               value={String(form["githubUrl"] ?? "")}
               onChange={(e) => set("githubUrl", e.target.value)}
             />
-          </div>
-          <div className="mt-4">
             <Input
               label="LinkedIn URL"
+              placeholder="https://linkedin.com/…"
               value={String(form["linkedinUrl"] ?? "")}
               onChange={(e) => set("linkedinUrl", e.target.value)}
             />
@@ -202,11 +208,11 @@ export function SettingsManager() {
         </SettingsSection>
 
         <SettingsSection title="Features" description="Toggle platform capabilities on or off.">
-          <div className="space-y-1">
+          <div className="space-y-1" role="group" aria-label="Feature toggles">
             {BOOL_FIELDS.map(({ key, label, description }) => (
               <label
                 key={key}
-                className="flex items-center justify-between gap-4 rounded-xl px-4 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
+                className="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
               >
                 <div className="min-w-0">
                   <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</span>
@@ -214,15 +220,16 @@ export function SettingsManager() {
                     <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{description}</p>
                   )}
                 </div>
-                <div className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center">
+                <div className="relative inline-flex h-6 w-11 shrink-0 items-center">
                   <input
                     type="checkbox"
                     checked={Boolean(form[key])}
                     onChange={(e) => set(key, e.target.checked)}
+                    aria-label={label}
                     className="peer sr-only"
                   />
-                  <span className="absolute inset-0 rounded-full bg-zinc-200 transition-colors peer-checked:bg-zinc-900 dark:bg-zinc-700 dark:peer-checked:bg-zinc-100" />
-                  <span className="pointer-events-none relative mx-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5 dark:bg-zinc-900 dark:peer-checked:bg-zinc-900" />
+                  <span aria-hidden className="absolute inset-0 rounded-full bg-zinc-200 transition-colors peer-checked:bg-zinc-900 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-900 dark:bg-zinc-700 dark:peer-checked:bg-zinc-100 dark:peer-focus-visible:outline-zinc-100" />
+                  <span aria-hidden className="pointer-events-none relative mx-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5 dark:bg-zinc-900 dark:peer-checked:bg-zinc-900" />
                 </div>
               </label>
             ))}
@@ -235,14 +242,23 @@ export function SettingsManager() {
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200/60 bg-white px-6 py-4 dark:border-zinc-800/60 dark:bg-zinc-950">
+        <div className="sticky bottom-4 z-30 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-zinc-200/60 bg-white/95 px-6 py-4 shadow-xl shadow-zinc-900/5 backdrop-blur dark:border-zinc-800/60 dark:bg-zinc-950/95 dark:shadow-zinc-950/20">
           <Button type="submit" loading={saving} disabled={!touched}>
             Save settings
           </Button>
-          {isSuccess && !touched && (
+          {touched ? (
+            <span className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              Unsaved changes
+            </span>
+          ) : isSuccess ? (
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
               <Check className="h-4 w-4" aria-hidden />
               Saved
+            </span>
+          ) : (
+            <span className="text-sm text-zinc-400 dark:text-zinc-500">
+              No changes yet
             </span>
           )}
         </div>

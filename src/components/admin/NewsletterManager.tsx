@@ -7,14 +7,15 @@ import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
 import { Input } from "@/src/components/ui/Input";
 import { Pagination } from "@/src/components/ui/Pagination";
-import { Select } from "@/src/components/ui/Select";
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { useToast } from "@/src/components/ui/Toast";
 import {
   useAdminNewsletterQuery,
   useDeleteSubscriberMutation,
   useUpdateSubscriberMutation,
 } from "@/src/store/api/adminApi";
 import { ConfirmDialog, FilterBar, PageHeader, StatusBadge, formatDate } from "./shared";
+import { cx, focusRing } from "@/src/components/ui/shared";
 
 const STATUS_MAP: Record<string, string> = {
   active: "success",

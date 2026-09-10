@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/src/components/ui/Button";
@@ -226,37 +227,58 @@ export function StatCard({
   value,
   icon: Icon,
   accent,
+  href,
+  hint,
 }: {
   label: string;
   value: number | string;
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   accent?: string;
+  href?: string;
+  hint?: string;
 }) {
-  return (
-    <div className="group relative overflow-hidden rounded-2xl border border-zinc-200/60 bg-white p-5 transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-900/5 dark:border-zinc-800/60 dark:bg-zinc-950 dark:hover:border-zinc-700 dark:hover:shadow-zinc-950/20">
-      <div className="flex items-start justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-            {label}
-          </p>
-          <p
-            className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 tabular-nums dark:text-zinc-50"
-            aria-live="polite"
-          >
-            {typeof value === "number" ? compact(value) : value}
-          </p>
-        </div>
-        {Icon && (
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: accent ? `${accent}12` : undefined, color: accent }}
-          >
-            <Icon className="h-5 w-5" aria-hidden />
-          </div>
-        )}
+  const body = (
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          {label}
+        </p>
+        <p className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 tabular-nums dark:text-zinc-50">
+          {typeof value === "number" ? compact(value) : value}
+        </p>
       </div>
+      {Icon && (
+        <div
+          aria-hidden
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+          style={accent ? { backgroundColor: `${accent}12`, color: accent } : undefined}
+        >
+          <Icon className="h-5 w-5" aria-hidden />
+        </div>
+      )}
     </div>
   );
+
+  const cardClass = cx(
+    "group relative block overflow-hidden rounded-2xl border border-zinc-200/60 bg-white p-5 transition-colors duration-150 outline-none",
+    "hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-900/5 active:bg-zinc-50",
+    "dark:border-zinc-800/60 dark:bg-zinc-950 dark:hover:border-zinc-700 dark:hover:shadow-zinc-950/20 dark:active:bg-zinc-900",
+    focusRing,
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        aria-label={hint ? `${label}: ${typeof value === "number" ? value.toLocaleString() : value}. ${hint}` : label}
+        className={cardClass}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return <div className={cardClass}>{body}</div>;
 }
 
 /* ------------------------------------------------------------------ */

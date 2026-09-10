@@ -147,7 +147,9 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
         <li>
           <Link
             href="/"
-            className="inline-flex items-center gap-1 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+            className={cx(
+              "inline-flex items-center gap-1 rounded-sm transition-colors outline-none hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-300 dark:focus-visible:outline-zinc-100",
+            )}
           >
             <Home className="h-3.5 w-3.5" aria-hidden />
             <span className="hidden sm:inline">Site</span>
@@ -166,7 +168,9 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
             ) : (
               <Link
                 href={c.href}
-                className="transition-colors hover:text-zinc-700 dark:hover:text-zinc-300"
+                className={cx(
+                  "rounded-sm transition-colors outline-none hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-300 dark:focus-visible:outline-zinc-100",
+                )}
               >
                 {c.label}
               </Link>
@@ -288,7 +292,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         aria-label="Admin navigation"
       >
         <div className="flex h-14 items-center gap-2.5 border-b border-zinc-200 px-5 dark:border-zinc-800">
-          <Link href="/admin" className="flex items-center gap-2.5">
+          <Link
+            href="/admin"
+            aria-label="Admin dashboard"
+            className={cx(
+              "flex items-center gap-2.5 rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100",
+            )}
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-100">
               <Newspaper className="h-4 w-4 text-white dark:text-zinc-900" aria-hidden />
             </div>
@@ -386,8 +396,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         type="button"
         onClick={scrollToTop}
         aria-label="Scroll to top"
+        tabIndex={showScrollTop ? 0 : -1}
         className={cx(
-          "scroll-top-btn fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white shadow-lg transition-all hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300",
+          "scroll-top-btn fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white shadow-lg transition-all outline-none hover:bg-zinc-700 active:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 dark:active:bg-zinc-200 dark:focus-visible:outline-zinc-100",
           showScrollTop && "visible",
         )}
       >
