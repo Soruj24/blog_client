@@ -240,7 +240,7 @@ export function AIAssistant({ title, excerpt, content, onApply }: AIAssistantPro
             <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">AI Assistant</h3>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">AI Assistant</h2>
             <p className="text-[11px] text-zinc-400">Gemma · LangGraph · Streaming</p>
           </div>
         </div>
@@ -248,24 +248,25 @@ export function AIAssistant({ title, excerpt, content, onApply }: AIAssistantPro
 
       <div className="p-5">
         {/* Action grid */}
-        <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-4">
+        <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-4" role="group" aria-label="AI actions">
           {ACTIONS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               type="button"
+              aria-pressed={active === key}
               onClick={() => {
                 setActive(key);
                 setOutput("");
                 setError(null);
                 setCost(null);
               }}
-              className={`flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-medium transition-all duration-150 ${
+              className={`flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-medium outline-none transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-violet-600 dark:focus-visible:outline-violet-400 ${
                 active === key
                   ? "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300"
                   : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" aria-hidden />
               {label}
             </button>
           ))}
@@ -274,6 +275,7 @@ export function AIAssistant({ title, excerpt, content, onApply }: AIAssistantPro
         {/* Input */}
         <div className="mt-4">
           <Textarea
+            aria-label="AI assistant input"
             placeholder={
               active === "title"
                 ? "e.g. The future of serverless"

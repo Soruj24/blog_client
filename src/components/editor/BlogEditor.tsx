@@ -8,6 +8,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  Archive,
+  Bold,
+  Calendar,
+  Check,
   ChevronDown,
   ChevronUp,
   Eye,
@@ -15,10 +19,7 @@ import {
   LoaderCircle,
   Save,
   Send,
-  Calendar,
-  Archive,
   Clock,
-  Bold,
   Italic,
   Heading2,
   Quote,
@@ -47,11 +48,26 @@ import { CoverUpload } from "./CoverUpload";
 const AIAssistant = dynamic(() => import("./AIAssistant").then((m) => m.AIAssistant), {
   ssr: false,
   loading: () => (
-    <div className="rounded-2xl border border-violet-200/50 bg-violet-50/30 p-4 text-sm text-zinc-500 dark:border-violet-800/30 dark:bg-violet-950/20">
-      Loading AI assistant…
+    <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 dark:border-zinc-800/70 dark:bg-zinc-950" role="status" aria-label="Loading AI assistant">
+      <div className="h-4 w-32 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
+      <div className="mt-4 grid grid-cols-4 gap-1.5">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="h-12 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+        ))}
+      </div>
     </div>
   ),
 });
+
+const FORMAT_TOOLS = [
+  { key: "bold", label: "Bold", prefix: "**", suffix: "**", Icon: Bold },
+  { key: "italic", label: "Italic", prefix: "*", suffix: "*", Icon: Italic },
+  { key: "heading", label: "Heading", prefix: "## ", suffix: "", Icon: Heading2 },
+  { key: "quote", label: "Quote", prefix: "> ", suffix: "", Icon: Quote },
+  { key: "code", label: "Code", prefix: "`", suffix: "`", Icon: Code },
+  { key: "list", label: "Bulleted list", prefix: "- ", suffix: "", Icon: List },
+  { key: "link", label: "Link", prefix: "[", suffix: "](url)", Icon: LinkIcon },
+] as const;
 
 const editorSchema = z
   .object({
@@ -372,10 +388,18 @@ export function BlogEditor({ postId }: { postId?: string }) {
 
   if (postLoading && isEditing) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="flex items-center gap-3 text-zinc-500">
-          <LoaderCircle className="h-5 w-5 animate-spin" />
-          <span className="text-sm">Loading editor…</span>
+      <div className="min-h-screen" role="status" aria-label="Loading editor">
+        <div className="border-b border-zinc-200/70 dark:border-zinc-800/70">
+          <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 sm:px-6">
+            <div className="h-9 w-9 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-4 w-24 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
+            <div className="ml-auto h-8 w-24 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+          </div>
+        </div>
+        <div className="mx-auto max-w-6xl space-y-4 px-4 py-6 sm:px-6">
+          <div className="h-10 w-2/3 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+          <div className="h-24 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+          <div className="h-64 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
         </div>
       </div>
     );
@@ -384,60 +408,64 @@ export function BlogEditor({ postId }: { postId?: string }) {
   const isBusy = creating || updating || isSubmitting;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-16">
+      <h1 className="sr-only">{isEditing ? "Edit story" : "Write a new story"}</h1>
       {/* ── Top bar ─────────────────────────────────────────────── */}
       <div className="sticky top-16 z-20 border-b border-zinc-200/70 bg-white/80 backdrop-blur-md dark:border-zinc-800/70 dark:bg-zinc-950/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2.5 sm:gap-3 sm:px-6">
           {/* Left: back + status */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="inline-flex items-center gap-1.5 rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors outline-none hover:bg-zinc-100 hover:text-zinc-700 active:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 dark:active:bg-zinc-700 dark:focus-visible:outline-zinc-100"
               aria-label="Go back"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" aria-hidden />
             </button>
-            <div className="flex items-center gap-2 text-sm" aria-live="polite">
+            <div className="flex min-w-0 items-center gap-2 text-sm" aria-live="polite">
               {savingDraft && (
                 <span className="inline-flex items-center gap-1.5 text-zinc-500">
-                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden />
                   <span className="hidden sm:inline">Saving…</span>
                 </span>
               )}
               {!savingDraft && lastSaved && (
-                <span className="text-zinc-400">Saved {lastSaved.toLocaleTimeString()}</span>
+                <span className="truncate text-xs text-zinc-400 sm:text-sm">
+                  Saved {lastSaved.toLocaleTimeString()}
+                </span>
               )}
               {!savingDraft && !lastSaved && isDirty && (
                 <Badge tone="warning">Unsaved</Badge>
               )}
               {!savingDraft && !lastSaved && !isDirty && (
-                <span className="text-zinc-400">Draft</span>
+                <span className="text-sm text-zinc-400">{isEditing ? "Editing" : "New draft"}</span>
               )}
             </div>
           </div>
 
           {/* Center: reading stats */}
-          <div className="hidden items-center gap-4 text-xs text-zinc-400 sm:flex">
+          <div className="hidden items-center gap-4 text-xs tabular-nums text-zinc-400 md:flex">
             <span>{wordCount.toLocaleString()} words</span>
-            <span className="h-3 w-px bg-zinc-200 dark:bg-zinc-700" />
+            <span className="h-3 w-px bg-zinc-200 dark:bg-zinc-700" aria-hidden />
             <span className="inline-flex items-center gap-1">
-              <Clock className="h-3 w-3" />
+              <Clock className="h-3 w-3" aria-hidden />
               {readingTime} min read
             </span>
           </div>
 
-          {/* Right: actions */}
-          <div className="flex items-center gap-2">
+          {/* Right: primary actions only — Schedule/Archive live in Publish settings */}
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowPreview((v) => !v)}
-              className="hidden sm:inline-flex"
+              aria-pressed={showPreview}
             >
               {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {showPreview ? "Edit" : "Preview"}
+              <span className="hidden sm:inline">{showPreview ? "Edit" : "Preview"}</span>
+              <span className="sr-only sm:hidden">{showPreview ? "Back to editing" : "Preview story"}</span>
             </Button>
             <Button
               type="button"
@@ -448,28 +476,7 @@ export function BlogEditor({ postId }: { postId?: string }) {
             >
               <Save className="h-4 w-4" />
               <span className="hidden sm:inline">Save</span>
-            </Button>
-            <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onArchive}
-              disabled={isBusy}
-              className="hidden sm:inline-flex"
-            >
-              <Archive className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={onSchedule}
-              loading={isBusy}
-              className="hidden sm:inline-flex"
-            >
-              <Calendar className="h-4 w-4" />
-              Schedule
+              <span className="sr-only sm:hidden">Save draft</span>
             </Button>
             <Button
               type="button"
@@ -487,7 +494,7 @@ export function BlogEditor({ postId }: { postId?: string }) {
       {/* ── Preview mode ────────────────────────────────────────── */}
       {showPreview ? (
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-          <p className="eyebrow text-zinc-400">Preview</p>
+          <p className="eyebrow text-zinc-500 dark:text-zinc-400">Preview</p>
           <h1 className="headline mt-3 text-4xl leading-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
             {watchedTitle || "Untitled"}
           </h1>
@@ -521,20 +528,31 @@ export function BlogEditor({ postId }: { postId?: string }) {
             {/* ── Main content ──────────────────────────────────────── */}
             <div className="space-y-5">
               {/* Title */}
-              <input
-                type="text"
-                placeholder="Untitled"
-                className="w-full border-none bg-transparent font-serif text-3xl font-bold tracking-tight text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:ring-0 dark:text-zinc-100 dark:placeholder:text-zinc-700 sm:text-4xl"
-                {...register("title")}
-              />
+              <div>
+                <label htmlFor="post-title" className="sr-only">
+                  Post title
+                </label>
+                <input
+                  id="post-title"
+                  type="text"
+                  placeholder="Untitled"
+                  aria-invalid={!!errors.title || undefined}
+                  className="w-full border-none bg-transparent font-serif text-3xl font-bold tracking-tight text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:ring-0 dark:text-zinc-100 dark:placeholder:text-zinc-700 sm:text-4xl"
+                  {...register("title")}
+                />
+              </div>
               {errors.title && (
-                <p className="text-sm text-red-500">{errors.title.message}</p>
+                <p role="alert" className="text-sm text-red-500">{errors.title.message}</p>
               )}
 
               {/* Slug */}
               <div className="flex items-center gap-2 text-sm text-zinc-400">
-                <span className="shrink-0">/blog/</span>
+                <span className="shrink-0" aria-hidden>/blog/</span>
+                <label htmlFor="post-slug" className="sr-only">
+                  Post slug
+                </label>
                 <input
+                  id="post-slug"
                   type="text"
                   placeholder="your-slug"
                   className="min-w-0 flex-1 border-none bg-transparent text-zinc-600 placeholder:text-zinc-300 focus:outline-none focus:ring-0 dark:text-zinc-400 dark:placeholder:text-zinc-700"
@@ -546,62 +564,59 @@ export function BlogEditor({ postId }: { postId?: string }) {
               {/* Excerpt */}
               <div>
                 <Textarea
+                  aria-label="Excerpt"
                   placeholder="Write a compelling excerpt — shown in feeds and previews."
                   rows={2}
                   error={errors.excerpt?.message}
                   {...register("excerpt")}
                   className="text-sm"
                 />
-                <p className="mt-1 text-right text-xs text-zinc-400">
+                <p className="mt-1 text-right text-xs tabular-nums text-zinc-400">
                   {(watchedExcerpt || "").length}/300
                 </p>
               </div>
 
               {/* Markdown toolbar */}
-              <div className="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-200/70 bg-zinc-50 px-2 py-1.5 dark:border-zinc-800/70 dark:bg-zinc-900/50">
-                <button type="button" onClick={() => insertMarkdown("**", "**")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Bold">
-                  <Bold className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("*", "*")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Italic">
-                  <Italic className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("## ")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Heading">
-                  <Heading2 className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("> ")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Quote">
-                  <Quote className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("`", "`")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Code">
-                  <Code className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("- ")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="List">
-                  <List className="h-4 w-4" />
-                </button>
-                <button type="button" onClick={() => insertMarkdown("[", "](url)")} className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300" title="Link">
-                  <LinkIcon className="h-4 w-4" />
-                </button>
-                <div className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
+              <div
+                role="toolbar"
+                aria-label="Formatting"
+                className="flex flex-wrap items-center gap-1 rounded-xl border border-zinc-200/70 bg-zinc-50 px-2 py-1.5 dark:border-zinc-800/70 dark:bg-zinc-900/50"
+              >
+                {FORMAT_TOOLS.map(({ key, label, prefix, suffix, Icon }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => insertMarkdown(prefix, suffix)}
+                    aria-label={label}
+                    title={label}
+                    className="rounded-lg p-2 text-zinc-500 transition-colors outline-none hover:bg-zinc-200/70 hover:text-zinc-700 active:bg-zinc-300/70 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-300 dark:active:bg-zinc-700 dark:focus-visible:outline-zinc-100"
+                  >
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </button>
+                ))}
+                <div className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-700" aria-hidden />
                 <span className="px-2 text-xs text-zinc-400">Markdown supported</span>
               </div>
 
               {/* Content */}
               <div>
                 <Textarea
+                  aria-label="Story content (Markdown)"
                   placeholder="Start writing your story…"
                   rows={22}
                   error={errors.content?.message}
                   {...register("content")}
                   className="font-mono text-sm leading-relaxed"
                 />
-                <div className="mt-2 flex items-center justify-between text-xs text-zinc-400">
+                <div className="mt-2 flex items-center justify-between text-xs tabular-nums text-zinc-400">
                   <span>{(watchedContent || "").length.toLocaleString()} characters</span>
                   <span>{wordCount.toLocaleString()} words · {readingTime} min read</span>
                 </div>
               </div>
 
               {/* Cover image */}
-              <div className="rounded-2xl border border-zinc-200/70 p-5 dark:border-zinc-800/70">
-                <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Cover image</h3>
+              <section aria-labelledby="cover-heading" className="rounded-2xl border border-zinc-200/70 p-5 dark:border-zinc-800/70">
+                <h2 id="cover-heading" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Cover image</h2>
                 <div className="mt-3">
                   <CoverUpload
                     value={watchedCover || null}
@@ -611,12 +626,13 @@ export function BlogEditor({ postId }: { postId?: string }) {
                 </div>
                 <div className="mt-3">
                   <Input
+                    aria-label="Cover image URL"
                     placeholder="https://… or upload above"
                     {...register("coverImage")}
                     hint="Direct URL after upload, or paste external"
                   />
                 </div>
-              </div>
+              </section>
 
               {/* Category & Tags */}
               <div className="grid gap-4 sm:grid-cols-2">
@@ -636,19 +652,11 @@ export function BlogEditor({ postId }: { postId?: string }) {
               </div>
             </div>
 
-            {/* ── Sidebar ───────────────────────────────────────────── */}
+            {/* ── Sidebar: task flow — configure → verify → assist → optimize ── */}
             <div className="space-y-5">
-              {/* AI Assistant — prominent placement */}
-              <AIAssistant
-                title={watchedTitle || ""}
-                excerpt={watchedExcerpt || ""}
-                content={watchedContent || ""}
-                onApply={handleAiApply}
-              />
-
               {/* Publish settings */}
-              <div className="rounded-2xl border border-zinc-200/70 bg-white p-5 dark:border-zinc-800/70 dark:bg-zinc-950">
-                <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Publish</h3>
+              <section aria-labelledby="publish-heading" className="rounded-2xl border border-zinc-200/70 bg-white p-5 dark:border-zinc-800/70 dark:bg-zinc-950">
+                <h2 id="publish-heading" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Publish</h2>
                 <div className="mt-4 space-y-3">
                   <Select
                     label="Status"
@@ -668,11 +676,11 @@ export function BlogEditor({ postId }: { postId?: string }) {
                       hint="Must be in the future"
                     />
                   )}
-                  <label className="flex items-center gap-2.5 text-sm">
+                  <label className="flex cursor-pointer items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
                     <input
                       type="checkbox"
                       {...register("featured")}
-                      className="rounded-lg"
+                      className="h-4 w-4 shrink-0 rounded accent-zinc-900 dark:accent-zinc-100"
                       disabled={!canFeature}
                     />
                     <span>Featured post</span>
@@ -680,25 +688,118 @@ export function BlogEditor({ postId }: { postId?: string }) {
                       <span className="text-xs text-zinc-400">(admin/editor)</span>
                     )}
                   </label>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={onSchedule}
+                      loading={isBusy}
+                      className="flex-1"
+                    >
+                      <Calendar className="h-4 w-4" aria-hidden />
+                      Schedule
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={onArchive}
+                      disabled={isBusy}
+                      className="flex-1"
+                    >
+                      <Archive className="h-4 w-4" aria-hidden />
+                      Archive
+                    </Button>
+                  </div>
                 </div>
+              </section>
+
+              {/* Publishing checklist — collapsible */}
+              <div className="rounded-2xl border border-zinc-200/70 bg-white dark:border-zinc-800/70 dark:bg-zinc-950">
+                <button
+                  type="button"
+                  onClick={() => setChecklistOpen((v) => !v)}
+                  aria-expanded={checklistOpen}
+                  aria-controls="editor-checklist"
+                  className="flex w-full items-center justify-between rounded-2xl p-5 text-left outline-none transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-900 dark:hover:bg-zinc-900 dark:focus-visible:outline-zinc-100"
+                >
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Checklist</h2>
+                    <span className="text-xs tabular-nums text-zinc-400" aria-hidden>{checklistDone}/{checklist.length}</span>
+                    <span className="sr-only">{checklistDone} of {checklist.length} ready</span>
+                  </div>
+                  {checklistOpen ? (
+                    <ChevronUp className="h-4 w-4 text-zinc-400" aria-hidden />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-zinc-400" aria-hidden />
+                  )}
+                </button>
+                {checklistOpen && (
+                  <div id="editor-checklist" className="space-y-2 px-5 pb-5">
+                    {/* Progress bar */}
+                    <div
+                      role="progressbar"
+                      aria-valuenow={checklistDone}
+                      aria-valuemin={0}
+                      aria-valuemax={checklist.length}
+                      aria-label="Publishing readiness"
+                      className="h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
+                    >
+                      <div
+                        className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+                        style={{ width: `${(checklistDone / checklist.length) * 100}%` }}
+                      />
+                    </div>
+                    <ul className="space-y-2">
+                      {checklist.map((item) => (
+                        <li
+                          key={item.label}
+                          className={`flex items-center gap-2 text-sm ${
+                            item.done ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500 dark:text-zinc-400"
+                          }`}
+                        >
+                          <span
+                            aria-hidden
+                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-current"
+                          >
+                            {item.done && <Check className="h-2.5 w-2.5" />}
+                          </span>
+                          {item.label}
+                          <span className="sr-only">{item.done ? "done" : "pending"}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
+
+              {/* AI Assistant */}
+              <AIAssistant
+                title={watchedTitle || ""}
+                excerpt={watchedExcerpt || ""}
+                content={watchedContent || ""}
+                onApply={handleAiApply}
+              />
 
               {/* SEO — collapsible */}
               <div className="rounded-2xl border border-zinc-200/70 bg-white dark:border-zinc-800/70 dark:bg-zinc-950">
                 <button
                   type="button"
                   onClick={() => setSeoOpen((v) => !v)}
-                  className="flex w-full items-center justify-between p-5 text-left"
+                  aria-expanded={seoOpen}
+                  aria-controls="editor-seo"
+                  className="flex w-full items-center justify-between rounded-2xl p-5 text-left outline-none transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-900 dark:hover:bg-zinc-900 dark:focus-visible:outline-zinc-100"
                 >
-                  <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">SEO</h3>
+                  <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">SEO</h2>
                   {seoOpen ? (
-                    <ChevronUp className="h-4 w-4 text-zinc-400" />
+                    <ChevronUp className="h-4 w-4 text-zinc-400" aria-hidden />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-zinc-400" />
+                    <ChevronDown className="h-4 w-4 text-zinc-400" aria-hidden />
                   )}
                 </button>
                 {seoOpen && (
-                  <div className="space-y-3 px-5 pb-5">
+                  <div id="editor-seo" className="space-y-3 px-5 pb-5">
                     <Input
                       label="SEO Title"
                       placeholder="Defaults to post title"
@@ -714,7 +815,7 @@ export function BlogEditor({ postId }: { postId?: string }) {
                         error={errors.seoDescription?.message}
                         {...register("seoDescription")}
                       />
-                      <p className="mt-1 text-right text-xs text-zinc-400">
+                      <p className="mt-1 text-right text-xs tabular-nums text-zinc-400">
                         {(watchedSeoDesc || "").length}/160
                       </p>
                     </div>
@@ -734,49 +835,6 @@ export function BlogEditor({ postId }: { postId?: string }) {
                       url={watchedSeoUrl || `https://inkwell.demo/blog/${watchedSlug || "your-slug"}`}
                       image={watchedOg || watchedCover}
                     />
-                  </div>
-                )}
-              </div>
-
-              {/* Publishing checklist — collapsible */}
-              <div className="rounded-2xl border border-zinc-200/70 bg-white dark:border-zinc-800/70 dark:bg-zinc-950">
-                <button
-                  type="button"
-                  onClick={() => setChecklistOpen((v) => !v)}
-                  className="flex w-full items-center justify-between p-5 text-left"
-                >
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Checklist</h3>
-                    <span className="text-xs text-zinc-400">{checklistDone}/{checklist.length}</span>
-                  </div>
-                  {checklistOpen ? (
-                    <ChevronUp className="h-4 w-4 text-zinc-400" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-zinc-400" />
-                  )}
-                </button>
-                {checklistOpen && (
-                  <div className="space-y-2 px-5 pb-5">
-                    {/* Progress bar */}
-                    <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                      <div
-                        className="h-full rounded-full bg-emerald-500 transition-all duration-300"
-                        style={{ width: `${(checklistDone / checklist.length) * 100}%` }}
-                      />
-                    </div>
-                    {checklist.map((item) => (
-                      <div
-                        key={item.label}
-                        className={`flex items-center gap-2 text-sm ${
-                          item.done ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-500"
-                        }`}
-                      >
-                        <span className="h-4 w-4 shrink-0 rounded-full border current-color flex items-center justify-center text-[10px]">
-                          {item.done ? "✓" : ""}
-                        </span>
-                        {item.label}
-                      </div>
-                    ))}
                   </div>
                 )}
               </div>

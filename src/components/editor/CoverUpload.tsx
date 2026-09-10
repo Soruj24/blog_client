@@ -60,35 +60,44 @@ export function CoverUpload({
   return (
     <div>
       {value ? (
-        <div className="group relative overflow-hidden rounded-xl border border-zinc-200/70 dark:border-zinc-800/70">
+        <div className="group relative overflow-hidden rounded-xl border border-zinc-200/70 focus-within:border-zinc-400 dark:border-zinc-800/70 dark:focus-within:border-zinc-600">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt="Cover preview" className="h-48 w-full object-cover" />
-          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 transition-colors group-hover:bg-black/40">
+          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 transition-colors group-hover:bg-black/40 group-focus-within:bg-black/40">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/90 px-3 text-sm font-medium text-zinc-900 opacity-0 backdrop-blur transition-all hover:bg-white group-hover:opacity-100"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/90 px-3 text-sm font-medium text-zinc-900 opacity-0 backdrop-blur transition-all outline-none hover:bg-white focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white group-hover:opacity-100"
             >
-              <Upload className="h-3.5 w-3.5" />
+              <Upload className="h-3.5 w-3.5" aria-hidden />
               Replace
             </button>
             <button
               type="button"
               onClick={onRemove}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-zinc-900 opacity-0 backdrop-blur transition-all hover:bg-white group-hover:opacity-100"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-zinc-900 opacity-0 backdrop-blur transition-all outline-none hover:bg-white focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white group-hover:opacity-100"
               aria-label="Remove cover image"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden />
             </button>
           </div>
         </div>
       ) : (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Upload cover image. Drop an image or press Enter to browse."
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all duration-200 ${
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center outline-none transition-all duration-200 focus-visible:border-zinc-400 focus-visible:ring-2 focus-visible:ring-zinc-900/10 dark:focus-visible:border-zinc-600 dark:focus-visible:ring-zinc-100/10 ${
             dragOver
               ? "border-violet-400 bg-violet-50/50 dark:border-violet-500 dark:bg-violet-950/20"
               : "border-zinc-200 bg-zinc-50/50 hover:border-zinc-300 hover:bg-zinc-100/50 dark:border-zinc-800 dark:bg-zinc-900/30 dark:hover:border-zinc-700"
