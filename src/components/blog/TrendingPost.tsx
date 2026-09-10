@@ -9,7 +9,7 @@ import type { ArticleSummary } from "@/src/store/api/contentApi";
 export function TrendingPost({ article, rank }: { article: ArticleSummary; rank: number }) {
   const href = `/blog/${article.slug}`;
   return (
-    <div className="group flex gap-6 py-6 transition-colors duration-200 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-xl">
+    <div className="group flex gap-5 rounded-xl px-3 py-5 transition-colors duration-150 hover:bg-zinc-100/60 sm:gap-6 sm:px-4 sm:py-6 dark:hover:bg-zinc-900/60">
       <span
         aria-hidden
         className="headline w-14 shrink-0 text-5xl font-light text-zinc-200 sm:text-6xl dark:text-zinc-800"
@@ -21,7 +21,7 @@ export function TrendingPost({ article, rank }: { article: ArticleSummary; rank:
         <h3 className="headline text-lg leading-snug text-zinc-900 dark:text-zinc-100 sm:text-xl">
           <Link
             href={href}
-            className="transition-colors duration-200 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="rounded-sm transition-colors duration-150 outline-none hover:text-zinc-600 active:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-300 dark:active:text-zinc-200 dark:focus-visible:outline-zinc-100"
           >
             {article.title}
           </Link>

@@ -15,7 +15,7 @@ export function AuthorsSection() {
 
   return (
     <section aria-labelledby="authors-heading">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <SectionHeading
           id="authors-heading"
           eyebrow="Voices to follow"
@@ -23,10 +23,10 @@ export function AuthorsSection() {
           description="Writers whose work readers keep coming back to."
         />
         {!mounted || isLoading ? (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="Loading authors">
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" role="status" aria-label="Loading authors">
             {Array.from({ length: 4 }).map((_, i) => (
               <li key={i}>
-                <Skeleton className="h-64 !rounded-2xl" />
+                <Skeleton className="h-64 rounded-2xl" />
               </li>
             ))}
           </ul>

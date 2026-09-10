@@ -17,8 +17,8 @@ export function TrendingSection() {
   return (
     <section aria-labelledby="trending-heading" className="relative">
       {/* Subtle background tint */}
-      <div className="absolute inset-0 bg-zinc-50/50 dark:bg-zinc-900/30" />
-      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+      <div className="absolute inset-0 bg-zinc-50/50 dark:bg-zinc-900/30" aria-hidden />
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <SectionHeading
           id="trending-heading"
           eyebrow="Most read"
@@ -27,7 +27,7 @@ export function TrendingSection() {
           actionLabel="View rankings"
         />
         {!mounted || isLoading ? (
-          <div className="max-w-3xl" aria-label="Loading trending articles">
+          <div className="max-w-3xl" role="status" aria-label="Loading trending articles">
             <SkeletonText lines={8} />
           </div>
         ) : isError || !data ? (

@@ -8,11 +8,11 @@ const TrendingSection = dynamic(
   () => import("@/src/components/home/TrendingSection").then((m) => m.TrendingSection),
   {
     loading: () => (
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16" aria-hidden>
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
         <div className="mt-8 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900" />
+            <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
           ))}
         </div>
       </div>
@@ -24,11 +24,11 @@ const CategoriesSection = dynamic(
   () => import("@/src/components/home/CategoriesSection").then((m) => m.CategoriesSection),
   {
     loading: () => (
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16" aria-hidden>
+        <div className="h-8 w-48 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-900" />
+            <div key={i} className="h-[92px] animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
           ))}
         </div>
       </div>

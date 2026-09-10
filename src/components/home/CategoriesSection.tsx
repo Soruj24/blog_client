@@ -11,10 +11,10 @@ import { useMounted } from "@/src/hooks/useMounted";
 
 function CategoriesSkeleton() {
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Loading categories">
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading categories">
       {Array.from({ length: 6 }).map((_, i) => (
         <li key={i}>
-          <Skeleton className="h-[92px] !rounded-2xl" />
+          <Skeleton className="h-[92px] rounded-2xl" />
         </li>
       ))}
     </ul>
@@ -27,7 +27,7 @@ export function CategoriesSection() {
 
   return (
     <section aria-labelledby="categories-heading">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <SectionHeading
           id="categories-heading"
           eyebrow="Browse by topic"

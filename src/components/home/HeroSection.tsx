@@ -10,15 +10,16 @@ export function HeroSection() {
   const categories = useListCategoriesQuery();
 
   const statsReady = articles.isSuccess && categories.isSuccess;
+  const statsFailed = articles.isError || categories.isError;
 
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-hidden">
       {/* Decorative background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/80 via-white to-white dark:from-zinc-900/50 dark:via-zinc-950 dark:to-zinc-950" />
-      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-zinc-100/50 blur-3xl dark:bg-zinc-800/20" />
-      <div className="absolute -left-32 top-32 h-64 w-64 rounded-full bg-zinc-100/30 blur-3xl dark:bg-zinc-800/10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/80 via-white to-white dark:from-zinc-900/50 dark:via-zinc-950 dark:to-zinc-950" aria-hidden />
+      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-zinc-100/50 blur-3xl dark:bg-zinc-800/20" aria-hidden />
+      <div className="absolute -left-32 top-32 h-64 w-64 rounded-full bg-zinc-100/30 blur-3xl dark:bg-zinc-800/10" aria-hidden />
 
-      <div className="relative mx-auto max-w-6xl px-4 pt-20 pb-16 sm:px-6 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24">
+      <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-12 sm:px-6 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
         <div className="max-w-3xl">
           {/* Eyebrow */}
           <p className="eyebrow text-zinc-500 dark:text-zinc-400">
@@ -60,14 +61,14 @@ export function HeroSection() {
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href="#latest"
-              className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-7 py-3.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:shadow-md dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-zinc-900 px-7 text-sm font-medium text-white shadow-sm transition-colors duration-150 outline-none hover:bg-zinc-800 active:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300 dark:focus-visible:outline-zinc-100"
             >
               Start reading
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               href="/write"
-              className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/50 px-7 py-3.5 text-sm font-medium text-zinc-700 transition-all duration-200 hover:border-zinc-300 hover:bg-white hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+              className="inline-flex h-12 items-center gap-2 rounded-full border border-zinc-200 bg-white/50 px-7 text-sm font-medium text-zinc-700 transition-colors duration-150 outline-none hover:border-zinc-300 hover:bg-white active:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 dark:active:bg-zinc-800 dark:focus-visible:outline-zinc-100"
             >
               <SquarePen className="h-4 w-4" aria-hidden />
               Write with us
@@ -75,7 +76,7 @@ export function HeroSection() {
           </div>
 
           {/* Stats */}
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
+          <div className="mt-10 flex min-h-6 flex-wrap items-center gap-x-8 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
             {statsReady ? (
               <>
                 <span className="flex items-center gap-2">
@@ -92,7 +93,7 @@ export function HeroSection() {
                   {(categories.data?.length ?? 0) === 1 ? "category" : "categories"}
                 </span>
               </>
-            ) : (
+            ) : statsFailed ? null : (
               <Skeleton className="h-5 w-48" />
             )}
           </div>

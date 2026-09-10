@@ -27,7 +27,7 @@ export function CoverFallback({ title }: { title: string }) {
 export const PostCard = memo(function PostCard({ article, highlight }: { article: ArticleSummary; highlight?: string }) {
   const href = `/blog/${article.slug}`;
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200/70 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lift dark:border-zinc-800/70 dark:bg-zinc-950 dark:hover:border-zinc-700">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200/70 bg-white transition-colors duration-150 hover:border-zinc-300 hover:shadow-lift dark:border-zinc-800/70 dark:bg-zinc-950 dark:hover:border-zinc-700">
       <Link
         href={href}
         aria-hidden="true"
@@ -55,7 +55,7 @@ export const PostCard = memo(function PostCard({ article, highlight }: { article
         <h3 className="headline mt-3 text-xl leading-snug text-zinc-900 dark:text-zinc-100">
           <Link
             href={href}
-            className="transition-colors duration-200 group-hover:text-zinc-600 dark:group-hover:text-zinc-300"
+            className="rounded-sm transition-colors duration-150 outline-none group-hover:text-zinc-600 active:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:group-hover:text-zinc-300 dark:active:text-zinc-200 dark:focus-visible:outline-zinc-100"
           >
             {highlight ? <SearchHighlight text={article.title} query={highlight} /> : article.title}
           </Link>

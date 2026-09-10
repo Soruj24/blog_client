@@ -41,7 +41,7 @@ export function FeaturedPost({ article, priority = false }: { article: ArticleSu
         <h3 className="headline mt-5 text-3xl leading-tight tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-[2.5rem]">
           <Link
             href={href}
-            className="transition-colors duration-200 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="rounded-sm transition-colors duration-150 outline-none hover:text-zinc-600 active:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-300 dark:active:text-zinc-200 dark:focus-visible:outline-zinc-100"
           >
             {article.title}
           </Link>
@@ -58,7 +58,7 @@ export function FeaturedPost({ article, priority = false }: { article: ArticleSu
         <p className="mt-7">
           <Link
             href={href}
-            className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:shadow-md dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="inline-flex h-12 items-center gap-2 rounded-full bg-zinc-900 px-7 text-sm font-medium text-white shadow-sm transition-colors duration-150 outline-none hover:bg-zinc-800 active:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300 dark:focus-visible:outline-zinc-100"
           >
             Read article
             <ArrowRight className="h-4 w-4" aria-hidden />

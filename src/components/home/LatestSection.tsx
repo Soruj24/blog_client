@@ -26,8 +26,8 @@ export function LatestSection() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
-    <section aria-labelledby="latest-heading" className="scroll-mt-20">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+    <section aria-labelledby="latest-heading" id="latest" className="scroll-mt-20">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <SectionHeading
           id="latest-heading"
           eyebrow="Fresh off the press"
@@ -36,7 +36,7 @@ export function LatestSection() {
           actionLabel="Explore all"
         />
         {!mounted || isLoading ? (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-label="Loading articles">
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading articles">
             {Array.from({ length: PAGE_SIZE }).map((_, i) => (
               <li key={i}>
                 <SkeletonArticle />
