@@ -133,28 +133,44 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
       />
       <ViewTracker slug={slug} />
 
-      {/* Breadcrumb */}
+      {/* Breadcrumb — trail back to the library, not the current title */}
       <nav aria-label="Breadcrumb">
-        <ol className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <ol className="flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
           <li>
-            <Link href="/" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
+            <Link
+              href="/"
+              className="rounded-sm transition-colors outline-none hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100"
+            >
               Home
             </Link>
           </li>
           <li aria-hidden>
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-3.5 w-3.5 text-zinc-300 dark:text-zinc-600" />
           </li>
           <li>
-            <Link href="/blog" className="transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">
+            <Link
+              href="/blog"
+              className="rounded-sm transition-colors outline-none hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100"
+            >
               Blog
             </Link>
           </li>
-          <li aria-hidden>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </li>
-          <li aria-current="page" className="max-w-48 truncate font-medium text-zinc-900 sm:max-w-xs dark:text-zinc-100">
-            {article.title}
-          </li>
+          {article.category && (
+            <>
+              <li aria-hidden>
+                <ChevronRight className="h-3.5 w-3.5 text-zinc-300 dark:text-zinc-600" />
+              </li>
+              <li>
+                <Link
+                  href={`/blog?category=${article.category.slug}`}
+                  aria-current="page"
+                  className="rounded-sm font-medium text-zinc-700 transition-colors outline-none hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100"
+                >
+                  {article.category.name}
+                </Link>
+              </li>
+            </>
+          )}
         </ol>
       </nav>
 
@@ -163,56 +179,68 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         <header>
           <p className="flex flex-wrap items-center gap-2">
             {article.category && (
-              <Link href={`/blog?category=${article.category.slug}`}>
+              <Link
+                href={`/blog?category=${article.category.slug}`}
+                className="rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
+              >
                 <Badge tone="primary">{article.category.name}</Badge>
               </Link>
             )}
             {article.featured && <Badge tone="neutral">Featured</Badge>}
           </p>
-          <h1 className="headline mt-4 text-3xl leading-tight tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-[2.5rem]">
+          <h1 className="headline mt-4 text-3xl leading-[1.15] tracking-tight text-balance text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-[2.75rem]">
             {article.title}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
             {article.excerpt}
           </p>
 
-          {/* Author + meta */}
+          {/* Byline */}
           <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
             {article.author && (
               <p className="flex items-center gap-2.5">
                 <Avatar name={article.author.name} src={article.author.avatarUrl} size="md" />
                 <span>
-                  <span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">{article.author.name}</span>
+                  {article.author.username ? (
+                    <Link
+                      href={`/author/${article.author.username}`}
+                      className="block rounded-sm text-sm font-semibold text-zinc-900 outline-none hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-100 dark:focus-visible:outline-zinc-100"
+                    >
+                      {article.author.name}
+                    </Link>
+                  ) : (
+                    <span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      {article.author.name}
+                    </span>
+                  )}
                   {article.author.username && (
-                    <span className="block text-xs text-zinc-500 dark:text-zinc-400">@{article.author.username}</span>
+                    <span className="block text-xs text-zinc-500 dark:text-zinc-400">
+                      @{article.author.username}
+                    </span>
                   )}
                 </span>
               </p>
             )}
-            <p className="flex flex-wrap items-center gap-x-3 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="flex flex-wrap items-center gap-x-2 text-sm text-zinc-500 dark:text-zinc-400">
               {article.publishedAt && <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>}
+              {article.publishedAt && (
+                <span aria-hidden className="text-zinc-300 dark:text-zinc-600">·</span>
+              )}
               <span className="inline-flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" aria-hidden />
                 {article.readingTime} min read
               </span>
-              <span className="inline-flex items-center gap-1" title={`${article.views} reads`}>
+              <span aria-hidden className="text-zinc-300 dark:text-zinc-600">·</span>
+              <span className="inline-flex items-center gap-1">
                 <Eye className="h-3.5 w-3.5" aria-hidden />
                 {article.views.toLocaleString()}
+                <span className="sr-only"> reads</span>
               </span>
             </p>
           </div>
-
-          {/* Actions bar */}
-          <div className="mt-6 flex flex-wrap items-center gap-2 border-y border-zinc-200/70 py-3 dark:border-zinc-800/70">
-            <LikeButton slug={slug} initialLiked={engagement.liked} initialCount={article.likeCount} />
-            <BookmarkButton slug={slug} initialBookmarked={engagement.bookmarked} />
-            <span className="ml-auto">
-              <ShareButtons title={article.title} />
-            </span>
-          </div>
         </header>
 
-        {/* Cover image */}
+        {/* Cover image — the visual anchor, directly after the header */}
         {article.coverImage && (
           <figure className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900">
             <Image
@@ -223,39 +251,63 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
               sizes="(max-width: 768px) 100vw, 768px"
               className="object-cover"
             />
-            <figcaption className="sr-only">{article.title}</figcaption>
           </figure>
         )}
 
         {/* Article body */}
         <ArticleBody content={article.content} />
 
-        {/* Tags */}
-        {article.tags.length > 0 && (
-          <footer className="mt-10">
-            <h2 className="sr-only">Tags</h2>
-            <ul aria-label="Tags" className="flex flex-wrap gap-2">
-              {article.tags.map((tag) => (
-                <li key={tag.id}>
-                  <Link href={`/blog?tag=${tag.slug}`}>
-                    <Badge tone="neutral">#{tag.name}</Badge>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </footer>
-        )}
+        {/* Tags + share */}
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-zinc-200/70 pt-6 dark:border-zinc-800/70">
+          {article.tags.length > 0 ? (
+            <div className="min-w-0">
+              <h2 className="sr-only">Tags</h2>
+              <ul aria-label="Tags" className="flex flex-wrap gap-2">
+                {article.tags.map((tag) => (
+                  <li key={tag.id}>
+                    <Link
+                      href={`/blog?tag=${tag.slug}`}
+                      className="rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
+                    >
+                      <Badge tone="neutral">#{tag.name}</Badge>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <span aria-hidden className="hidden sm:block" />
+          )}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Share</span>
+            <ShareButtons title={article.title} />
+          </div>
+        </div>
+
+        {/* Engagement band — like/save where reading intent peaks */}
+        <div className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-zinc-200/70 bg-zinc-50 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left dark:border-zinc-800/70 dark:bg-zinc-900/50">
+          <div>
+            <p className="headline text-xl text-zinc-900 dark:text-zinc-100">Enjoyed this story?</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Show some love or save it for later.
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <LikeButton slug={slug} initialLiked={engagement.liked} initialCount={article.likeCount} />
+            <BookmarkButton slug={slug} initialBookmarked={engagement.bookmarked} />
+          </div>
+        </div>
 
         {/* Author card */}
         {article.author && (
-          <aside aria-label={`More from ${article.author.name}`} className="mt-8 flex items-center gap-4 rounded-2xl border border-zinc-200/70 bg-zinc-50 p-5 dark:border-zinc-800/70 dark:bg-zinc-900/50">
+          <aside aria-label={`More from ${article.author.name}`} className="mt-6 flex items-center gap-4 rounded-2xl border border-zinc-200/70 bg-white p-5 dark:border-zinc-800/70 dark:bg-zinc-950">
             <Avatar name={article.author.name} src={article.author.avatarUrl} size="lg" />
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Written by</p>
-              <p className="headline mt-0.5 text-lg text-zinc-900 dark:text-zinc-100">{article.author.name}</p>
+              <p className="eyebrow text-zinc-500 dark:text-zinc-400">Written by</p>
+              <p className="headline mt-1 text-lg text-zinc-900 dark:text-zinc-100">{article.author.name}</p>
               {article.author.username && (
-                <Link href={`/blog?author=${article.author.username}`} className="mt-1 inline-block text-sm font-medium text-zinc-600 underline underline-offset-4 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
-                  More from @{article.author.username}
+                <Link href={`/author/${article.author.username}`} className="mt-1 inline-block rounded-sm text-sm font-medium text-zinc-600 underline underline-offset-4 transition-colors outline-none hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100">
+                  View profile
                 </Link>
               )}
             </div>
