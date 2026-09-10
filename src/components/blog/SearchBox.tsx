@@ -169,7 +169,7 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
               type="submit"
               aria-label="Search"
               className={cx(
-                "inline-flex h-8 w-8 items-center justify-center rounded-xl bg-zinc-900 text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200",
+                "inline-flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300",
                 focusRing,
               )}
             >
@@ -193,17 +193,17 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
                     }}
                     onMouseEnter={() => setCursor(i)}
                     className={cx(
-                      "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors",
+                      "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm outline-none transition-colors focus-visible:bg-zinc-100 dark:focus-visible:bg-zinc-900",
                       i === cursor
                         ? "bg-zinc-100 dark:bg-zinc-900"
-                        : "hover:bg-zinc-50 dark:hover:bg-zinc-900/60",
+                        : "hover:bg-zinc-50 active:bg-zinc-100 dark:hover:bg-zinc-900/60 dark:active:bg-zinc-900",
                       focusRing,
                     )}
                   >
                     {item.kind === "post" ? (
                       <FileText className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
                     ) : (
-                      <Tag className="h-4 w-4 shrink-0 text-violet-500" aria-hidden />
+                      <Tag className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
                     )}
                     <span className="truncate">
                       {item.kind === "post" ? (
@@ -231,7 +231,10 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
                         setValue(r);
                         submit(r);
                       }}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                      className={cx(
+                        "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm outline-none transition-colors hover:bg-zinc-50 active:bg-zinc-100 focus-visible:bg-zinc-100 dark:hover:bg-zinc-900/60 dark:active:bg-zinc-900 dark:focus-visible:bg-zinc-900",
+                        focusRing,
+                      )}
                     >
                       <Clock className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
                       <span className="truncate">{r}</span>
@@ -246,7 +249,10 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
                   clearRecentSearches();
                   setHistoryCleared(true);
                 }}
-                className="w-full px-4 py-2 text-left text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+                className={cx(
+                  "w-full px-4 py-2 text-left text-xs font-medium text-zinc-400 outline-none transition-colors hover:text-zinc-600 active:text-zinc-800 focus-visible:text-zinc-800 dark:hover:text-zinc-300 dark:active:text-zinc-100 dark:focus-visible:text-zinc-100",
+                  focusRing,
+                )}
               >
                 Clear history
               </button>

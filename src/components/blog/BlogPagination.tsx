@@ -23,6 +23,7 @@ export function BlogPagination({ page, totalPages }: { page: number; totalPages:
     // Try specific result anchors, fallback to top
     const target =
       document.getElementById("blog-results") ||
+      document.getElementById("search-results") ||
       document.getElementById("category-results") ||
       document.getElementById("tag-results") ||
       document.getElementById("author-results");

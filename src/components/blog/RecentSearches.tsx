@@ -58,7 +58,7 @@ export function RecentSearches() {
                 <Link
                   href={`/search?q=${encodeURIComponent(r)}`}
                   className={cx(
-                    "inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-4 py-2 text-sm text-zinc-700 transition-all duration-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-900",
+                    "inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-4 py-2 text-sm text-zinc-700 transition-colors duration-150 outline-none hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:border-zinc-800/70 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 dark:active:bg-zinc-800 dark:focus-visible:outline-zinc-100",
                     focusRing,
                   )}
                 >
@@ -82,7 +82,7 @@ export function RecentSearches() {
               <Link
                 href={`/search?q=${encodeURIComponent(s)}`}
                 className={cx(
-                  "inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-4 py-2 text-sm text-zinc-700 transition-all duration-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-900",
+                  "inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-4 py-2 text-sm text-zinc-700 transition-colors duration-150 outline-none hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:border-zinc-800/70 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 dark:active:bg-zinc-800 dark:focus-visible:outline-zinc-100",
                   focusRing,
                 )}
               >
@@ -136,14 +136,14 @@ export function NoSearchResults({ query }: { query: string }) {
       <p className="mt-6 flex flex-wrap justify-center gap-2">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-zinc-900 px-5 text-sm font-medium text-white transition-colors outline-none hover:bg-zinc-800 active:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300 dark:focus-visible:outline-zinc-100"
         >
           Browse all stories
           <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
         <Link
           href="/search"
-          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 transition-all duration-200 hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+          className="inline-flex h-10 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors outline-none hover:border-zinc-300 hover:bg-zinc-50 active:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 dark:active:bg-zinc-800 dark:focus-visible:outline-zinc-100"
         >
           Clear search
         </Link>
