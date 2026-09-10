@@ -42,25 +42,25 @@ export function Modal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         className={cn(
-          "gap-0 p-0 overflow-hidden",
-          "rounded-t-2xl sm:rounded-2xl",
+          "w-[calc(100vw-2rem)] gap-0 overflow-hidden p-0",
+          "rounded-2xl",
           "max-h-[92dvh]",
           panelSizes[size],
         )}
       >
-        <DialogHeader className="px-5 pt-5 pb-4 sm:px-6 sm:pt-6 border-b border-zinc-200/70 dark:border-zinc-800/70">
-          <DialogTitle className="font-serif text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <DialogHeader className="shrink-0 border-b border-zinc-200/70 px-5 pb-4 pt-5 text-left sm:px-6 sm:pt-6 dark:border-zinc-800/70">
+          <DialogTitle className="headline pr-10 text-xl tracking-tight text-zinc-900 dark:text-zinc-100">
             {title}
           </DialogTitle>
           {description && (
-            <DialogDescription className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+            <DialogDescription className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
-        <div className="overflow-y-auto px-5 py-4 sm:px-6">{children}</div>
+        <div className="admin-scroll overflow-y-auto px-5 py-4 sm:px-6">{children}</div>
         {footer && (
-          <DialogFooter className="flex flex-col-reverse gap-2 border-t border-zinc-200/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-6 dark:border-zinc-800/70">
+          <DialogFooter className="flex shrink-0 flex-col-reverse gap-2 border-t border-zinc-200/70 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end sm:px-6 dark:border-zinc-800/70">
             {footer}
           </DialogFooter>
         )}

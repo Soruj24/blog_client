@@ -39,30 +39,44 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const articles = q ? await fetchBlogArticles({ ...filters, sort: filters.sort }) : null;
 
   return (
-    <div className="min-h-screen">
-      {/* ── Hero area ──────────────────────────────────────────── */}
-      <div className="relative overflow-hidden border-b border-zinc-200/70 dark:border-zinc-800/70">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/80 via-white to-white dark:from-zinc-900/50 dark:via-zinc-950 dark:to-zinc-950" />
-        <div className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-zinc-100/50 blur-3xl dark:bg-zinc-800/20" />
+    <div className="min-h-screen pb-16 sm:pb-20">
+      {!q ? (
+        /* ── Landing hero — generous, centered: search is the destination ── */
+        <div className="relative overflow-hidden border-b border-zinc-200/70 dark:border-zinc-800/70">
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/80 via-white to-white dark:from-zinc-900/50 dark:via-zinc-950 dark:to-zinc-950" aria-hidden />
+          <div className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-zinc-100/50 blur-3xl dark:bg-zinc-800/20" aria-hidden />
 
-        <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <p className="eyebrow text-zinc-400 dark:text-zinc-500">Discover</p>
-          <h1 className="headline mt-3 text-3xl tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-5xl">
-            Search stories
-          </h1>
-          <p className="mx-auto mt-4 max-w-lg text-base text-zinc-500 dark:text-zinc-400">
-            Find articles by title, content, author, category, or tag.
-          </p>
+          <div className="relative mx-auto max-w-3xl px-4 py-12 text-center sm:px-6 sm:py-16">
+            <p className="eyebrow text-zinc-500 dark:text-zinc-400">Discover</p>
+            <h1 className="headline mt-3 text-3xl tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-5xl">
+              Search stories
+            </h1>
+            <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Find articles by title, content, author, category, or tag.
+            </p>
 
-          {/* Search box — centered, prominent */}
-          <div className="mx-auto mt-8 max-w-2xl">
-            <SearchBox key={q} initialQ={q} />
+            <div className="mx-auto mt-8 max-w-2xl text-left">
+              <SearchBox key={q} initialQ={q} />
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* ── Results header — compact so results start high on the page ── */
+        <div className="border-b border-zinc-200/70 dark:border-zinc-800/70">
+          <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-14">
+            <p className="eyebrow text-zinc-500 dark:text-zinc-400">Search</p>
+            <h1 className="headline mt-2 max-w-3xl text-2xl leading-tight tracking-tight text-balance text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+              Results for &ldquo;{q}&rdquo;
+            </h1>
+            <div className="mx-auto mt-6 max-w-2xl sm:mx-0">
+              <SearchBox key={q} initialQ={q} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Results area ───────────────────────────────────────── */}
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
         {!q ? (
           <div className="mx-auto max-w-2xl">
             <RecentSearches />
@@ -75,7 +89,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               action={
                 <Link
                   href={`/search?q=${encodeURIComponent(q)}`}
-                  className="inline-flex h-9 items-center rounded-full bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  className="inline-flex h-10 items-center rounded-full bg-zinc-900 px-5 text-sm font-medium text-white transition-colors outline-none hover:bg-zinc-800 active:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300 dark:focus-visible:outline-zinc-100"
                 >
                   Try again
                 </Link>
@@ -83,25 +97,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             />
           </div>
         ) : (
-          <>
+          <section aria-labelledby="search-results" className="scroll-mt-24">
             {/* Result count */}
-            <div className="mb-8">
-              <p aria-live="polite" className="text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="search-results" aria-live="polite" className="scroll-mt-24 text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
                 {articles.total === 0 ? (
-                  <>No stories found for &ldquo;<span className="font-medium text-zinc-900 dark:text-zinc-100">{q}</span>&rdquo;</>
+                  <>No stories found</>
                 ) : (
                   <>
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{articles.total}</span>{" "}
-                    {articles.total === 1 ? "story" : "stories"} matching &ldquo;
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{q}</span>&rdquo;
+                    <strong className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                      {articles.total}
+                    </strong>{" "}
+                    {articles.total === 1 ? "story" : "stories"} found
                     {articles.total > BLOG_PAGE_SIZE && (
-                      <span className="ml-1 text-zinc-400">
-                        — page {articles.page} of {Math.ceil(articles.total / BLOG_PAGE_SIZE)}
+                      <span>
+                        {" "}· page {articles.page} of {Math.ceil(articles.total / BLOG_PAGE_SIZE)}
                       </span>
                     )}
                   </>
                 )}
-              </p>
+              </h2>
+              {articles.total > 0 && (
+                <p className="text-[13px] text-zinc-400 dark:text-zinc-500">
+                  Titles, bodies, authors & tags
+                </p>
+              )}
             </div>
 
             {articles.items.length === 0 ? (
@@ -115,7 +135,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 />
               </>
             )}
-          </>
+          </section>
         )}
       </div>
     </div>

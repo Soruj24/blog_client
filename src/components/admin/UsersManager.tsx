@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Pencil, Search } from "lucide-react";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
@@ -10,6 +10,7 @@ import { Modal } from "@/src/components/ui/Modal";
 import { Pagination } from "@/src/components/ui/Pagination";
 import { Select } from "@/src/components/ui/Select";
 import { Skeleton } from "@/src/components/ui/Skeleton";
+import { useToast } from "@/src/components/ui/Toast";
 import { useAdminUsersQuery, useBulkUsersMutation, useUpdateUserMutation, type AdminUser } from "@/src/store/api/adminApi";
 import {
   BulkBar,
@@ -22,18 +23,33 @@ import {
   useSelection,
 } from "./shared";
 
-const ROLE_MAP: Record<string, string> = {
-  admin: "danger",
-  editor: "info",
-  author: "primary",
+/* Only the privileged role gets visual weight — red would read as an error. */
+const ROLE_MAP: Record<string, "primary" | "neutral"> = {
+  admin: "primary",
+  editor: "neutral",
+  author: "neutral",
   reader: "neutral",
 };
 
+const ROLE_OPTIONS = [
+  { value: "", label: "All roles" },
+  { value: "admin", label: "Admin" },
+  { value: "editor", label: "Editor" },
+  { value: "author", label: "Author" },
+  { value: "reader", label: "Reader" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "", label: "All statuses" },
+  { value: "active", label: "Active" },
+  { value: "suspended", label: "Suspended" },
+];
+
 function UsersSkeleton() {
   return (
-    <div className="space-y-3" aria-label="Loading users">
+    <div className="space-y-3" role="status" aria-label="Loading users">
       {Array.from({ length: 6 }).map((_, i) => (
-        <Skeleton key={i} className="h-16 !rounded-xl" />
+        <Skeleton key={i} className="h-16 rounded-xl" />
       ))}
     </div>
   );
@@ -60,6 +76,7 @@ export function UsersManager() {
   });
   const [updateUser, { isLoading: saving }] = useUpdateUserMutation();
   const [bulk, { isLoading: bulking }] = useBulkUsersMutation();
+  const { toast } = useToast();
   const sel = useSelection();
 
   const rowIds = data?.items.map((u) => u._id) ?? [];
@@ -95,6 +112,7 @@ export function UsersManager() {
       setConfirmSuspend(false);
     } catch {
       setConfirmSuspend(false);
+      toast("Couldn't suspend users — please try again.", { tone: "error" });
     }
   };
 
@@ -103,13 +121,24 @@ export function UsersManager() {
       await bulk({ ids: [...sel.selected], status: "active" }).unwrap();
       sel.clear();
     } catch {
-      // handled by cache invalidation
+      toast("Couldn't activate users — please try again.", { tone: "error" });
     }
   };
 
+  const clearFilters = () => {
+    setDraft("");
+    setSearch("");
+    setRole("");
+    setStatus("");
+    resetPage();
+  };
+
+  const hasFilters = search !== "" || role !== "" || status !== "";
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
+
   return (
     <div className="space-y-6">
-      <PageHeader title="Users" description={`${data?.total ?? 0} accounts total.`} />
+      <PageHeader title="Users" description={`${data?.total ?? 0} ${data?.total === 1 ? "account" : "accounts"} total.`} />
 
       <FilterBar>
         <form
@@ -118,7 +147,9 @@ export function UsersManager() {
             resetPage();
             setSearch(draft.trim());
           }}
-          className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center"
+          role="search"
+          aria-label="Filter users"
+          className="flex flex-1 flex-col gap-2.5 sm:flex-row sm:items-center"
         >
           <div className="relative flex-1">
             <Search
@@ -133,48 +164,81 @@ export function UsersManager() {
               className="h-9 pl-9"
             />
           </div>
-          <Select
-            value={role}
-            onChange={(e) => {
-              setRole(e.target.value);
-              resetPage();
-            }}
-            aria-label="Filter by role"
-            className="h-9 sm:w-36"
-            options={[
-              { value: "", label: "All roles" },
-              { value: "admin", label: "Admin" },
-              { value: "editor", label: "Editor" },
-              { value: "author", label: "Author" },
-              { value: "reader", label: "Reader" },
-            ]}
-          />
-          <Select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              resetPage();
-            }}
-            aria-label="Filter by status"
-            className="h-9 sm:w-36"
-            options={[
-              { value: "", label: "All statuses" },
-              { value: "active", label: "Active" },
-              { value: "suspended", label: "Suspended" },
-            ]}
-          />
-          <Button type="submit" variant="secondary" size="sm" className="h-9">
-            Search
-          </Button>
+          <div className="flex gap-2.5">
+            <div className="flex-1 sm:w-36 sm:flex-none">
+              <Select
+                size="sm"
+                value={role}
+                onChange={(e) => {
+                  setRole(e.target.value);
+                  resetPage();
+                }}
+                aria-label="Filter by role"
+                options={ROLE_OPTIONS}
+              />
+            </div>
+            <div className="flex-1 sm:w-40 sm:flex-none">
+              <Select
+                size="sm"
+                value={status}
+                onChange={(e) => {
+                  setStatus(e.target.value);
+                  resetPage();
+                }}
+                aria-label="Filter by status"
+                options={STATUS_OPTIONS}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2.5">
+            <Button type="submit" variant="secondary" size="sm" className="h-9 flex-1 sm:flex-none">
+              Search
+            </Button>
+            {hasFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 flex-1 sm:flex-none"
+                onClick={clearFilters}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
         </form>
       </FilterBar>
+
+      {data && (
+        <p aria-live="polite" className="-mb-3 text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
+          {data.total === 0
+            ? "No accounts"
+            : `${data.total} ${data.total === 1 ? "account" : "accounts"}`}
+          {(role || status) && data.total > 0 && (
+            <span>
+              {" · "}
+              {[role, status].filter(Boolean).join(" · ")}
+            </span>
+          )}
+        </p>
+      )}
 
       {isLoading ? (
         <UsersSkeleton />
       ) : isError || !data ? (
         <ErrorState title="Couldn't load users" onRetry={() => void refetch()} />
       ) : data.items.length === 0 ? (
-        <EmptyState title="No users found" description="Try clearing search or filters." />
+        <EmptyState
+          title="No users found"
+          description={hasFilters ? "No accounts match this search or filter." : "New registrations will appear here."}
+          action={
+            hasFilters ? (
+              <Button variant="secondary" size="sm" onClick={clearFilters}>
+                Clear search & filters
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-zinc-200/60 bg-white dark:border-zinc-800/60 dark:bg-zinc-950">
           <table className="w-full min-w-[700px] text-left text-sm">
@@ -190,7 +254,7 @@ export function UsersManager() {
                 <th scope="col" className="px-4 py-3">User</th>
                 <th scope="col" className="px-4 py-3">Role</th>
                 <th scope="col" className="px-4 py-3">Status</th>
-                <th scope="col" className="px-4 py-3">Joined</th>
+                <th scope="col" className="hidden px-4 py-3 sm:table-cell">Joined</th>
                 <th scope="col" className="w-12 px-4 py-3 text-right">
                   <span className="sr-only">Edit</span>
                 </th>
@@ -200,7 +264,7 @@ export function UsersManager() {
               {data.items.map((u) => (
                 <tr
                   key={u._id}
-                  className="group transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-900/30"
+                  className="group transition-colors hover:bg-zinc-50/80 focus-within:bg-zinc-50/80 dark:hover:bg-zinc-900/30 dark:focus-within:bg-zinc-900/30"
                 >
                   <td className="px-4 py-3.5">
                     <RowCheckbox
@@ -209,32 +273,30 @@ export function UsersManager() {
                       label={`Select ${u.name}`}
                     />
                   </td>
-                  <td className="px-4 py-3.5">
-                    <p className="font-medium text-zinc-900 dark:text-zinc-100">{u.name}</p>
-                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{u.email}</p>
+                  <td className="max-w-56 px-4 py-3.5">
+                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-100" title={u.name}>{u.name}</p>
+                    <p className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400" title={u.email}>{u.email}</p>
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="whitespace-nowrap px-4 py-3.5">
                     <StatusBadge status={ROLE_MAP[u.role] ?? "neutral"} label={u.role} />
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="whitespace-nowrap px-4 py-3.5">
                     <StatusBadge
                       status={u.status === "active" ? "success" : "danger"}
                       label={u.status}
                     />
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3.5 text-zinc-500 dark:text-zinc-400">
+                  <td className="hidden whitespace-nowrap px-4 py-3.5 tabular-nums text-zinc-500 sm:table-cell dark:text-zinc-400">
                     {formatDate(u.createdAt)}
                   </td>
                   <td className="px-4 py-3.5 text-right">
                     <button
                       type="button"
                       onClick={() => openEdit(u)}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 opacity-100 outline-none transition-colors hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-zinc-900 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:active:bg-zinc-700 dark:focus-visible:outline-zinc-100"
                       aria-label={`Edit ${u.name}`}
                     >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
+                      <Pencil className="h-4 w-4" aria-hidden />
                     </button>
                   </td>
                 </tr>
@@ -244,19 +306,24 @@ export function UsersManager() {
         </div>
       )}
 
-      {data && Math.ceil(data.total / data.limit) > 1 && (
-        <Pagination
-          page={page}
-          totalPages={Math.ceil(data.total / data.limit)}
-          onChange={(p) => {
-            setPage(p);
-            sel.clear();
-          }}
-        />
+      {data && totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm tabular-nums text-zinc-500 dark:text-zinc-400" aria-live="polite">
+            Page {page} of {totalPages}
+          </p>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(p) => {
+              setPage(p);
+              sel.clear();
+            }}
+          />
+        </div>
       )}
 
       <BulkBar count={sel.count} onClear={sel.clear}>
-        <Button size="sm" variant="secondary" onClick={runBulkActivate}>
+        <Button size="sm" variant="secondary" loading={bulking} onClick={runBulkActivate}>
           Activate
         </Button>
         <Button size="sm" variant="danger" onClick={() => setConfirmSuspend(true)}>

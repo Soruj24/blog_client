@@ -25,9 +25,10 @@ import { Skeleton } from "@/src/components/ui/Skeleton";
 import { Badge } from "@/src/components/ui/Badge";
 import { Card } from "@/src/components/ui/Card";
 import { useToast } from "@/src/components/ui/Toast";
+import { cx } from "@/src/components/ui/shared";
 import { useAdminMediaQuery, useDeleteMediaMutation, useUpdateMediaMutation } from "@/src/store/api/adminApi";
 import type { AdminMedia } from "@/src/store/api/adminApi";
-import { ConfirmDialog, FilterBar, PageHeader, StatusBadge, formatDate } from "./shared";
+import { ConfirmDialog, PageHeader, formatDate } from "./shared";
 
 /* ── Constants ───────────────────────────────────────────────── */
 
@@ -76,12 +77,12 @@ function formatBytes(bytes: number | null): string {
 
 function MediaGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" aria-label="Loading media">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" role="status" aria-label="Loading media">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="space-y-2">
-          <Skeleton className="aspect-square w-full !rounded-xl" />
-          <Skeleton className="h-3 w-3/4 !rounded-md" />
-          <Skeleton className="h-3 w-1/2 !rounded-md" />
+          <Skeleton className="aspect-square w-full rounded-xl" />
+          <Skeleton className="h-3 w-3/4 rounded-md" />
+          <Skeleton className="h-3 w-1/2 rounded-md" />
         </div>
       ))}
     </div>
@@ -90,60 +91,21 @@ function MediaGridSkeleton() {
 
 function MediaListSkeleton() {
   return (
-    <div className="space-y-2" aria-label="Loading media">
+    <div className="space-y-2" role="status" aria-label="Loading media">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-950">
-          <Skeleton className="h-12 w-12 shrink-0 !rounded-lg" />
+          <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-1/3 !rounded-md" />
-            <Skeleton className="h-3 w-1/5 !rounded-md" />
+            <Skeleton className="h-4 w-1/3 rounded-md" />
+            <Skeleton className="h-3 w-1/5 rounded-md" />
           </div>
-          <Skeleton className="hidden h-6 w-16 !rounded-full sm:block" />
-          <Skeleton className="hidden h-4 w-20 !rounded-md md:block" />
-          <Skeleton className="hidden h-4 w-16 !rounded-md md:block" />
-          <Skeleton className="hidden h-4 w-20 !rounded-md lg:block" />
+          <Skeleton className="hidden h-6 w-16 rounded-full sm:block" />
+          <Skeleton className="hidden h-4 w-20 rounded-md md:block" />
+          <Skeleton className="hidden h-4 w-16 rounded-md md:block" />
+          <Skeleton className="hidden h-4 w-20 rounded-md lg:block" />
         </div>
       ))}
     </div>
-  );
-}
-
-/* ── Stat chips ──────────────────────────────────────────────── */
-
-function StatChip({
-  label,
-  value,
-  active,
-  onClick,
-  accent,
-}: {
-  label: string;
-  value: number;
-  active?: boolean;
-  onClick?: () => void;
-  accent?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left transition-all ${
-        active
-          ? "border-zinc-900 bg-zinc-900 text-white shadow-sm dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-          : "border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
-      }`}
-    >
-      <span
-        className="h-2 w-2 rounded-full"
-        style={{ backgroundColor: accent }}
-      />
-      <span className={`text-lg font-bold tabular-nums ${active ? "" : "text-zinc-900 dark:text-zinc-100"}`}>
-        {value}
-      </span>
-      <span className={`text-xs font-medium ${active ? "text-zinc-400" : "text-zinc-500 dark:text-zinc-400"}`}>
-        {label}
-      </span>
-    </button>
   );
 }
 
@@ -280,22 +242,38 @@ export function MediaManager() {
         description="Upload, manage, and organize your images."
         actions={
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-1 rounded-lg border border-zinc-200 bg-white p-0.5 dark:border-zinc-800 dark:bg-zinc-950 sm:flex">
+            <div
+              role="group"
+              aria-label="Layout"
+              className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-0.5 dark:border-zinc-800 dark:bg-zinc-950"
+            >
               <button
                 type="button"
                 onClick={() => setView("grid")}
-                className={`rounded-md p-1.5 transition-colors ${view === "grid" ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"}`}
+                aria-pressed={view === "grid"}
                 aria-label="Grid view"
+                className={cx(
+                  "rounded-md p-2 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100",
+                  view === "grid"
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:active:bg-zinc-700",
+                )}
               >
-                <Grid3X3 className="h-4 w-4" />
+                <Grid3X3 className="h-4 w-4" aria-hidden />
               </button>
               <button
                 type="button"
                 onClick={() => setView("list")}
-                className={`rounded-md p-1.5 transition-colors ${view === "list" ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"}`}
+                aria-pressed={view === "list"}
                 aria-label="List view"
+                className={cx(
+                  "rounded-md p-2 outline-none transition-colors focus-visible:outline-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100",
+                  view === "list"
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:active:bg-zinc-700",
+                )}
               >
-                <List className="h-4 w-4" />
+                <List className="h-4 w-4" aria-hidden />
               </button>
             </div>
             <Button
@@ -315,15 +293,15 @@ export function MediaManager() {
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}
-        className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all ${
+        className={`relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors duration-200 sm:p-8 ${
           dragOver
-            ? "border-violet-500 bg-violet-50/50 dark:border-violet-400 dark:bg-violet-950/20"
+            ? "border-zinc-900 bg-zinc-100/60 dark:border-zinc-100 dark:bg-zinc-800/40"
             : "border-zinc-200 bg-zinc-50/50 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/20 dark:hover:border-zinc-700"
         }`}
       >
         {uploading ? (
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-violet-600 dark:border-zinc-600 dark:border-t-violet-400" />
+          <div className="flex flex-col items-center gap-3" role="status" aria-label="Uploading image">
+            <div aria-hidden className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 dark:border-zinc-600 dark:border-t-zinc-100" />
             <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Uploading…</p>
           </div>
         ) : (
@@ -358,67 +336,83 @@ export function MediaManager() {
       </div>
 
       {/* ── Filters ───────────────────────────────────────────── */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/60 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search
-            aria-hidden
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
-          />
-          <Input
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search by ID, alt, folder…"
-            aria-label="Search media"
-            className="h-9 pl-9"
-          />
+      <div className="rounded-2xl border border-zinc-200/60 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950">
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center" role="search" aria-label="Filter media">
+          <div className="relative flex-1">
+            <Search
+              aria-hidden
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+            />
+            <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search by ID, alt, folder…"
+              aria-label="Search media"
+              className="h-9 pl-9"
+            />
+          </div>
+          <div className="flex gap-2.5">
+            <div className="flex-1 sm:w-36 sm:flex-none">
+              <Select
+                size="sm"
+                value={usage}
+                onChange={(e) => changeUsage(e.target.value)}
+                aria-label="Filter by usage"
+                options={USAGE_OPTIONS}
+              />
+            </div>
+            <div className="flex-1 sm:w-36 sm:flex-none">
+              <Select
+                size="sm"
+                value={format}
+                onChange={(e) => changeFormat(e.target.value)}
+                aria-label="Filter by format"
+                options={FORMAT_OPTIONS}
+              />
+            </div>
+          </div>
         </div>
-        <Select
-          value={usage}
-          onChange={(e) => changeUsage(e.target.value)}
-          aria-label="Filter by usage"
-          className="h-9 sm:w-36"
-          options={USAGE_OPTIONS}
-        />
-        <Select
-          value={format}
-          onChange={(e) => changeFormat(e.target.value)}
-          aria-label="Filter by format"
-          className="h-9 sm:w-36"
-          options={FORMAT_OPTIONS}
-        />
 
         {hasFilters && (
-          <div className="flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-800/70">
+            <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Active:</span>
             {search && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                &ldquo;{search}&rdquo;
-                <button type="button" onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }} className="ml-0.5 rounded-full p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700" aria-label="Clear search">
-                  <X className="h-3 w-3" />
+              <span className="inline-flex h-7 items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <span className="max-w-40 truncate">&ldquo;{search}&rdquo;</span>
+                <button type="button" onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }} className="inline-flex h-5 w-5 items-center justify-center rounded-full outline-none transition-colors hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700 dark:focus-visible:outline-zinc-100" aria-label="Clear search">
+                  <X className="h-3 w-3" aria-hidden />
                 </button>
               </span>
             )}
             {usage && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              <span className="inline-flex h-7 items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 {usage}
-                <button type="button" onClick={() => changeUsage("")} className="ml-0.5 rounded-full p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700" aria-label="Clear usage">
-                  <X className="h-3 w-3" />
+                <button type="button" onClick={() => changeUsage("")} className="inline-flex h-5 w-5 items-center justify-center rounded-full outline-none transition-colors hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700 dark:focus-visible:outline-zinc-100" aria-label="Clear usage filter">
+                  <X className="h-3 w-3" aria-hidden />
                 </button>
               </span>
             )}
             {format && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                {format.toUpperCase()}
-                <button type="button" onClick={() => changeFormat("")} className="ml-0.5 rounded-full p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700" aria-label="Clear format">
-                  <X className="h-3 w-3" />
+              <span className="inline-flex h-7 items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-1.5 text-xs font-medium uppercase text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                {format}
+                <button type="button" onClick={() => changeFormat("")} className="inline-flex h-5 w-5 items-center justify-center rounded-full outline-none transition-colors hover:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-700 dark:focus-visible:outline-zinc-100" aria-label="Clear format filter">
+                  <X className="h-3 w-3" aria-hidden />
                 </button>
               </span>
             )}
-            <button type="button" onClick={clearFilters} className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
+            <button type="button" onClick={clearFilters} className="inline-flex h-7 items-center rounded-full px-2.5 text-xs font-medium text-zinc-500 underline-offset-4 outline-none transition-colors hover:text-zinc-900 hover:underline focus-visible:outline-2 focus-visible:outline-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:outline-zinc-100">
               Clear all
             </button>
           </div>
         )}
       </div>
+
+      {/* ── Results meta ──────────────────────────────────────── */}
+      {data && (
+        <p aria-live="polite" className="-mb-3 text-sm tabular-nums text-zinc-500 dark:text-zinc-400">
+          {data.total === 0 ? "No assets" : `${data.total} ${data.total === 1 ? "asset" : "assets"}`}
+        </p>
+      )}
 
       {/* ── Content ───────────────────────────────────────────── */}
       {isLoading ? (
@@ -450,12 +444,12 @@ export function MediaManager() {
             return (
               <div
                 key={m._id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-200/60 bg-white transition-all duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-900/5 dark:border-zinc-800/60 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                className="group relative overflow-hidden rounded-xl border border-zinc-200/60 bg-white transition-colors duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-900/5 focus-within:border-zinc-300 dark:border-zinc-800/60 dark:bg-zinc-950 dark:hover:border-zinc-700 dark:focus-within:border-zinc-700"
               >
                 <button
                   type="button"
                   onClick={() => { setPreview(m); setEditingAlt(m.alt || ""); }}
-                  className="block w-full text-left"
+                  className="block w-full rounded-t-xl text-left outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
                   aria-label={`Preview ${m.publicId}`}
                 >
                   <div className="aspect-square overflow-hidden bg-zinc-100 dark:bg-zinc-900">
@@ -487,13 +481,12 @@ export function MediaManager() {
                 </div>
 
                 {/* Hover actions */}
-                <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-100 transition-opacity focus-within:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
                   <button
                     type="button"
                     onClick={() => handleCopy(m.url)}
-                    aria-label="Copy URL"
-                    title="Copy URL"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+                    aria-label={`Copy URL for ${m.publicId}`}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-white"
                   >
                     <Copy className="h-3.5 w-3.5" aria-hidden />
                   </button>
@@ -502,8 +495,7 @@ export function MediaManager() {
                       type="button"
                       onClick={() => setDeleting(m._id)}
                       aria-label={`Delete ${m.publicId}`}
-                      title="Delete"
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-red-600"
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-black/50 text-white outline-none backdrop-blur-sm transition-colors hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-white"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden />
                     </button>
@@ -515,22 +507,23 @@ export function MediaManager() {
         </div>
       ) : (
         /* ── List view ─────────────────────────────────────── */
-        <Card className="overflow-hidden border-0 p-0 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60">
+        <Card className="overflow-hidden rounded-2xl border border-zinc-200/60 p-0 shadow-sm dark:border-zinc-800/60">
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800/70">
             {data.items.map((m) => {
               const deletable = canDelete(m);
               return (
-                <div key={m._id} className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-900/30">
+                <div key={m._id} className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-zinc-50/80 focus-within:bg-zinc-50/80 dark:hover:bg-zinc-900/30 dark:focus-within:bg-zinc-900/30">
                   <button
                     type="button"
                     onClick={() => { setPreview(m); setEditingAlt(m.alt || ""); }}
-                    className="shrink-0"
+                    className="shrink-0 rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
                     aria-label={`Preview ${m.publicId}`}
                   >
                     <img
                       src={optimizedUrl(m.url, 120)}
-                      alt={m.alt || m.publicId}
+                      alt=""
                       loading="lazy"
+                      decoding="async"
                       className="h-12 w-12 rounded-lg object-cover"
                     />
                   </button>
@@ -561,23 +554,23 @@ export function MediaManager() {
                   <p className="hidden text-xs text-zinc-500 dark:text-zinc-400 lg:block">
                     {formatDate(m.createdAt)}
                   </p>
-                  <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex items-center gap-1 opacity-100 transition-opacity focus-within:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
                     <button
                       type="button"
                       onClick={() => handleCopy(m.url)}
-                      aria-label="Copy URL"
-                      className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                      aria-label={`Copy URL for ${m.publicId}`}
+                      className="rounded-lg p-2 text-zinc-400 outline-none transition-colors hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200 focus-visible:outline-2 focus-visible:outline-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:active:bg-zinc-700 dark:focus-visible:outline-zinc-100"
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-4 w-4" aria-hidden />
                     </button>
                     {deletable && (
                       <button
                         type="button"
                         onClick={() => setDeleting(m._id)}
                         aria-label={`Delete ${m.publicId}`}
-                        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+                        className="rounded-lg p-2 text-zinc-400 outline-none transition-colors hover:bg-red-50 hover:text-red-600 active:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400 dark:active:bg-red-950/60 dark:focus-visible:outline-red-400"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden />
                       </button>
                     )}
                   </div>
@@ -590,8 +583,8 @@ export function MediaManager() {
 
       {/* ── Pagination ────────────────────────────────────────── */}
       {data && Math.ceil(data.total / data.limit) > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm tabular-nums text-zinc-500 dark:text-zinc-400" aria-live="polite">
             Page {page} of {Math.ceil(data.total / data.limit)}
           </p>
           <Pagination
@@ -607,8 +600,8 @@ export function MediaManager() {
         <Modal
           open={!!preview}
           onClose={() => setPreview(null)}
-          title=""
-          description=""
+          title={preview.alt || preview.publicId}
+          description="Asset preview, details, and alt text."
           size="lg"
         >
           <div className="space-y-5">
@@ -620,72 +613,75 @@ export function MediaManager() {
                 sizes="(max-width: 768px) 100vw, 800px"
                 alt={preview.alt || preview.publicId}
                 loading="lazy"
+                decoding="async"
                 className="h-auto max-h-[55vh] w-full object-contain"
               />
             </div>
 
-            {/* Metadata grid */}
-            <div className="grid gap-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800 sm:grid-cols-2">
+            {/* Metadata */}
+            <dl className="grid gap-x-4 gap-y-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800 sm:grid-cols-2">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">File</p>
-                <p className="mt-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{preview.publicId}</p>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">File</dt>
+                <dd className="mt-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{preview.publicId}</dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Size</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{formatBytes(preview.bytes)}</p>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Size</dt>
+                <dd className="mt-1 text-sm tabular-nums text-zinc-700 dark:text-zinc-300">{formatBytes(preview.bytes)}</dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Dimensions</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Dimensions</dt>
+                <dd className="mt-1 text-sm tabular-nums text-zinc-700 dark:text-zinc-300">
                   {preview.width && preview.height ? `${preview.width} × ${preview.height} px` : "—"}
-                </p>
+                </dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Format</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{preview.format?.toUpperCase() ?? "—"}</p>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Format</dt>
+                <dd className="mt-1 text-sm uppercase text-zinc-700 dark:text-zinc-300">{preview.format ?? "—"}</dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Usage</p>
-                <div className="mt-1">
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Usage</dt>
+                <dd className="mt-1">
                   <Badge tone={USAGE_MAP[preview.usage] ?? "neutral"}>{preview.usage}</Badge>
-                </div>
+                </dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Folder</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{preview.folder || "—"}</p>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Folder</dt>
+                <dd className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{preview.folder || "—"}</dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Owner</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Owner</dt>
+                <dd className="mt-1 truncate text-sm text-zinc-700 dark:text-zinc-300">
                   {preview.owner?.name ?? "—"}
                   {preview.owner?.email && <span className="text-zinc-400"> · {preview.owner.email}</span>}
-                </p>
+                </dd>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Created</p>
-                <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{formatDate(preview.createdAt)}</p>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Uploaded</dt>
+                <dd className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{formatDate(preview.createdAt)}</dd>
               </div>
               {preview.post && (
                 <div className="sm:col-span-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Linked post</p>
-                  <p className="mt-1">
-                    <Link href={`/blog/${preview.post.slug}`} className="inline-flex items-center gap-1 text-sm text-violet-600 hover:underline dark:text-violet-400">
-                      {preview.post.title}
-                      <ExternalLink className="h-3 w-3" aria-hidden />
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Linked post</dt>
+                  <dd className="mt-1">
+                    <Link href={`/blog/${preview.post.slug}`} className="inline-flex items-center gap-1 rounded-sm text-sm font-medium text-zinc-900 underline underline-offset-4 outline-none transition-colors hover:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-100 dark:hover:text-zinc-300 dark:focus-visible:outline-zinc-100">
+                      <span className="truncate">{preview.post.title}</span>
+                      <ExternalLink className="h-3 w-3 shrink-0" aria-hidden />
                     </Link>
-                  </p>
+                  </dd>
                 </div>
               )}
-            </div>
+            </dl>
 
             {/* URL */}
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">URL</p>
+              <label htmlFor="media-url" className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">URL</label>
               <div className="mt-1.5 flex gap-2">
                 <input
+                  id="media-url"
                   readOnly
                   value={preview.url}
-                  className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-xs dark:border-zinc-800 dark:bg-zinc-900"
+                  onFocus={(e) => e.target.select()}
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-xs outline-none focus:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900"
                 />
                 <Button size="sm" variant="secondary" onClick={() => handleCopy(preview.url)}>
                   <Copy className="h-3.5 w-3.5" aria-hidden />
@@ -696,15 +692,16 @@ export function MediaManager() {
 
             {/* Alt text */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Alt text</label>
+              <label htmlFor="media-alt" className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Alt text</label>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Accessibility &amp; SEO — describe the image for screen readers.</p>
               <div className="mt-2 flex gap-2">
                 <input
+                  id="media-alt"
                   value={editingAlt}
                   onChange={(e) => setEditingAlt(e.target.value)}
                   maxLength={200}
                   placeholder="Describe the image…"
-                  className="flex-1 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-950 dark:placeholder:text-zinc-600 dark:hover:border-zinc-700 dark:focus:border-zinc-600 dark:focus:ring-zinc-100/10"
                 />
                 <Button size="sm" onClick={handleAltSave}>Save</Button>
               </div>

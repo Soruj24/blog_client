@@ -145,7 +145,7 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
             placeholder="Search articles, authors, topics…"
-            className="h-14 w-full rounded-2xl border border-zinc-200 bg-white pl-12 pr-24 text-base shadow-soft outline-none transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 hover:shadow-lift focus:border-zinc-400 focus:shadow-lift dark:border-zinc-800 dark:bg-zinc-950 dark:placeholder:text-zinc-500 dark:hover:border-zinc-700 dark:focus:border-zinc-600"
+            className="h-14 w-full rounded-2xl border border-zinc-200 bg-white pl-12 pr-24 text-base shadow-soft outline-none transition-colors duration-150 placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-950 dark:placeholder:text-zinc-500 dark:hover:border-zinc-700 dark:focus:border-zinc-600 dark:focus:ring-zinc-100/10"
           />
           <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1.5">
             {value && (
