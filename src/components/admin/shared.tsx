@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, TrendingUp } from "lucide-react";
 import { Button } from "@/src/components/ui/Button";
 import { Modal } from "@/src/components/ui/Modal";
 import { cx, focusRing } from "@/src/components/ui/shared";
@@ -324,6 +324,7 @@ export function StatusBadge({
     >
       {dot && (
         <span
+          aria-hidden
           className={cx(
             "h-1.5 w-1.5 rounded-full",
             status === "success" && "bg-emerald-500",
@@ -336,5 +337,67 @@ export function StatusBadge({
       )}
       {label ?? status}
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  PopularPosts — ranked posts panel shared by Dashboard + Analytics  */
+/* ------------------------------------------------------------------ */
+
+export interface PopularPostItem {
+  _id: string;
+  title: string;
+  slug: string;
+  views: number;
+  likes?: number;
+}
+
+export function PopularPosts({
+  title = "Popular posts",
+  subtitle = "Top by views",
+  items,
+}: {
+  title?: string;
+  subtitle?: string;
+  items: PopularPostItem[];
+}) {
+  if (items.length === 0) return null;
+  return (
+    <section
+      aria-label={title}
+      className="rounded-2xl border border-zinc-200/60 bg-white p-6 dark:border-zinc-800/60 dark:bg-zinc-950"
+    >
+      <div className="flex items-center gap-3">
+        <div aria-hidden className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
+          <TrendingUp className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</p>
+        </div>
+      </div>
+      <ul className="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800/70">
+        {items.slice(0, 5).map((p, i) => (
+          <li key={p._id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+            <span
+              aria-hidden
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 font-mono text-xs font-bold tabular-nums text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+            >
+              {i + 1}
+            </span>
+            <Link
+              href={`/blog/${p.slug}`}
+              className="min-w-0 flex-1 truncate rounded-sm text-sm font-medium text-zinc-900 underline-offset-4 outline-none transition-colors hover:text-zinc-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-100 dark:hover:text-zinc-300 dark:focus-visible:outline-zinc-100"
+            >
+              {p.title}
+            </Link>
+            <span className="shrink-0 text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+              {compact(p.views)} views
+              {p.likes !== undefined && ` · ${compact(p.likes)} likes`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

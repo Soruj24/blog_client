@@ -11,7 +11,6 @@ import {
   Newspaper,
   Pencil,
   ShieldAlert,
-  TrendingUp,
   Users,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/Button";
@@ -20,7 +19,7 @@ import { Skeleton } from "@/src/components/ui/Skeleton";
 import { cx, focusRing } from "@/src/components/ui/shared";
 import { useAdminStatsQuery, useAnalyticsQuery } from "@/src/store/api/adminApi";
 import { Bars, ChartCard, Donut, TimeSeries } from "./charts";
-import { PageHeader, StatCard, compact } from "./shared";
+import { PageHeader, PopularPosts, StatCard } from "./shared";
 
 const CONTENT_CARDS = [
   { key: "posts", label: "Total Posts", icon: FileText, href: "/admin/posts", hint: "Manage posts" },
@@ -203,41 +202,12 @@ export function DashboardHome() {
           {/* Popular posts */}
           {(a as unknown as { popular?: Array<{ _id: string; title: string; slug: string; views: number }> }).popular &&
             (a as unknown as { popular: Array<{ _id: string; title: string; slug: string; views: number }> }).popular.length > 0 && (
-              <div className="rounded-2xl border border-zinc-200/60 bg-white p-6 dark:border-zinc-800/60 dark:bg-zinc-950">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
-                    <TrendingUp className="h-4 w-4 text-zinc-600 dark:text-zinc-400" aria-hidden />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      Popular posts
-                    </h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Top by views in the last 30 days
-                    </p>
-                  </div>
-                </div>
-                <ul className="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800/70">
-                  {(a as unknown as { popular: Array<{ _id: string; title: string; slug: string; views: number; likes: number }> }).popular
-                    .slice(0, 5)
-                    .map((p, i) => (
-                      <li key={p._id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 font-mono text-xs font-bold text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                          {i + 1}
-                        </span>
-                        <Link
-                          href={`/blog/${p.slug}`}
-                          className="min-w-0 flex-1 truncate rounded-sm text-sm font-medium text-zinc-900 underline-offset-4 outline-none transition-colors hover:text-zinc-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-zinc-100 dark:hover:text-zinc-300 dark:focus-visible:outline-zinc-100"
-                        >
-                          {p.title}
-                        </Link>
-                        <span className="shrink-0 text-xs font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
-                          {compact(p.views)} views
-                        </span>
-                      </li>
-                    ))}
-                </ul>
-              </div>
+              <PopularPosts
+                subtitle="Top by views in the last 30 days"
+                items={
+                  (a as unknown as { popular: Array<{ _id: string; title: string; slug: string; views: number; likes: number }> }).popular
+                }
+              />
             )}
         </div>
       )}
