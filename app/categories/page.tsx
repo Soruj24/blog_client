@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LayoutGrid } from "lucide-react";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ErrorState } from "@/src/components/ui/ErrorState";
-import { CategoryCard } from "@/src/components/blog/CategoryCard";
+import { CategoryDirectory } from "@/src/components/blog/CategoryDirectory";
 import { CollectionJsonLd } from "@/src/components/seo/JsonLd";
 import { canonical, seoDescription, seoTitle } from "@/src/lib/seo";
 import type { Category } from "@/src/store/api/contentApi";
@@ -68,13 +68,7 @@ export default async function CategoriesPage() {
             description="Curated topics appear here once editors create them."
           />
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((category) => (
-              <li key={category._id}>
-                <CategoryCard category={category} />
-              </li>
-            ))}
-          </ul>
+          <CategoryDirectory categories={categories} />
         )}
       </div>
     </div>

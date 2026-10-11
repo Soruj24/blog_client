@@ -48,3 +48,14 @@ export function getRecentSnapshot(): string[] {
   if (!same) snapshotCache = fresh;
   return snapshotCache;
 }
+
+const emptySnapshot: string[] = [];
+
+/**
+ * Server snapshot for useSyncExternalStore. Must return the same
+ * reference on every call — a fresh [] per call looks perpetually
+ * dirty and triggers an infinite loop.
+ */
+export function getServerSearchesSnapshot(): string[] {
+  return emptySnapshot;
+}

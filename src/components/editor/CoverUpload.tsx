@@ -109,7 +109,7 @@ export function CoverUpload({
           <p className="mt-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {uploading ? "Uploading…" : "Drop image or click to upload"}
           </p>
-          <p className="mt-1 text-xs text-zinc-400">1200×800 recommended · up to 5MB</p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">1200×800 recommended · up to 5MB</p>
         </div>
       )}
       <input

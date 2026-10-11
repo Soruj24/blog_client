@@ -6,7 +6,12 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { SearchHighlight } from "@/src/components/blog/SearchHighlight";
 import { useSuggestArticlesQuery } from "@/src/store/api/contentApi";
 import { cx, focusRing } from "@/src/components/ui/shared";
-import { clearRecentSearches, getRecentSnapshot, saveRecentSearch } from "@/src/lib/recent-searches";
+import {
+  clearRecentSearches,
+  getRecentSnapshot,
+  getServerSearchesSnapshot,
+  saveRecentSearch,
+} from "@/src/lib/recent-searches";
 
 function subscribeToStorage(onChange: () => void): () => void {
   if (typeof window === "undefined") return () => undefined;
@@ -34,7 +39,7 @@ export function SearchBox({ initialQ }: { initialQ: string }) {
   const [debounced, setDebounced] = useState(initialQ);
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(-1);
-  const storedRecent = useSyncExternalStore(subscribeToStorage, getRecentSnapshot, () => []);
+  const storedRecent = useSyncExternalStore(subscribeToStorage, getRecentSnapshot, getServerSearchesSnapshot);
   const [historyCleared, setHistoryCleared] = useState(false);
   const recent = historyCleared ? [] : storedRecent;
   const rootRef = useRef<HTMLDivElement>(null);

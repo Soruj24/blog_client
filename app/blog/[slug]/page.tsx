@@ -10,6 +10,9 @@ import { ArticleBody } from "@/src/components/blog/ArticleBody";
 import { BookmarkButton, LikeButton } from "@/src/components/blog/ArticleActions";
 import { CommentsSection } from "@/src/components/blog/CommentsSection";
 import { PrevNextNav } from "@/src/components/blog/PrevNextNav";
+import { ReadingHistoryTracker } from "@/src/components/blog/ReadingHistoryTracker";
+import { ReadingProgress } from "@/src/components/blog/ReadingProgress";
+import { ScrollTopButton } from "@/src/components/blog/ScrollTopButton";
 import { RelatedStories } from "@/src/components/blog/RelatedStories/RelatedStories";
 import { ShareButtons } from "@/src/components/blog/ShareButtons";
 import { ViewTracker } from "@/src/components/blog/ViewTracker";
@@ -73,7 +76,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       title,
       description,
       publishedTime: article.publishedAt ?? undefined,
-      modifiedTime: article.publishedAt ?? undefined,
+      modifiedTime: article.updatedAt ?? article.publishedAt ?? undefined,
       authors: article.author ? [article.author.name] : undefined,
       tags: article.tags.map((t) => t.name),
       section: article.category?.name ?? undefined,
@@ -109,8 +112,6 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
     ? await fetchEngagement(slug, session.backendToken)
     : { liked: false, bookmarked: false };
 
-  const articleUrl = article.canonicalUrl ? absoluteUrl(article.canonicalUrl) : canonical(`/blog/${article.slug}`);
-
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <ArticleJsonLd
@@ -119,7 +120,7 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         slug={article.slug}
         coverImage={article.coverImage}
         publishedAt={article.publishedAt}
-        updatedAt={article.publishedAt}
+        updatedAt={article.updatedAt ?? article.publishedAt}
         author={article.author ? { name: article.author.name, username: article.author.username ?? undefined } : null}
         category={article.category?.name ?? null}
         tags={article.tags.map((t) => t.name)}
@@ -132,9 +133,16 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         ]}
       />
       <ViewTracker slug={slug} />
+      <ReadingHistoryTracker
+        slug={slug}
+        title={article.title}
+        categoryName={article.category?.name ?? null}
+        readingTime={article.readingTime}
+      />
+      <ReadingProgress />
 
       {/* Breadcrumb — trail back to the library, not the current title */}
-      <nav aria-label="Breadcrumb">
+      <nav aria-label="Breadcrumb" className="print:hidden">
         <ol className="flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
           <li>
             <Link
@@ -258,7 +266,7 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         <ArticleBody content={article.content} />
 
         {/* Tags + share */}
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-zinc-200/70 pt-6 dark:border-zinc-800/70">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-zinc-200/70 pt-6 print:hidden dark:border-zinc-800/70">
           {article.tags.length > 0 ? (
             <div className="min-w-0">
               <h2 className="sr-only">Tags</h2>
@@ -285,7 +293,7 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         </div>
 
         {/* Engagement band — like/save where reading intent peaks */}
-        <div className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-zinc-200/70 bg-zinc-50 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left dark:border-zinc-800/70 dark:bg-zinc-900/50">
+        <div className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-zinc-200/70 bg-zinc-50 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left print:hidden dark:border-zinc-800/70 dark:bg-zinc-900/50">
           <div>
             <p className="headline text-xl text-zinc-900 dark:text-zinc-100">Enjoyed this story?</p>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -315,10 +323,12 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
         )}
       </article>
 
-      <CommentsSection slug={slug} />
-      <PrevNextNav prev={article.prev} next={article.next} />
-      <RelatedStories items={related} />
-      <link rel="canonical" href={articleUrl} />
+      <div className="print:hidden">
+        <CommentsSection slug={slug} />
+        <PrevNextNav prev={article.prev} next={article.next} />
+        <RelatedStories items={related} />
+      </div>
+      <ScrollTopButton />
     </div>
   );
 }

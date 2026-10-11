@@ -154,7 +154,7 @@ function CommentItem({
             </time>
           )}
           {comment.isEdited && (
-            <span className="text-xs italic text-zinc-400 dark:text-zinc-500">(edited)</span>
+            <span className="text-xs italic text-zinc-500 dark:text-zinc-400">(edited)</span>
           )}
           <StatusChip status={comment.status} />
         </p>

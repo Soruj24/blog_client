@@ -3,17 +3,17 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 /**
- * Route protection — Edge-safe by design.
+ * Route protection — runs at the network boundary before rendering.
  * Must NEVER import "@/auth" here: the full Auth.js config pulls in the
  * MongoDB driver + node:crypto, which crash the Edge runtime (500s on
  * every matched route). Instead we verify the JWT session cookie
  * directly (jose/WebCrypto, edge-compatible); role comes from the
  * token claims our Auth.js jwt() callback sets.
- * - /dashboard/*, /write/* → any signed-in user (else /login?callbackUrl=…)
+ * - /dashboard/*, /write/*, /profile/*, /bookmarks/*, /notifications/* → any signed-in user (else /login?callbackUrl=…)
  * - /admin/* → role === "admin" (else home)
  * Public reading stays open — SEO pages are never gated.
  */
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   let role: string | undefined;
   let signedIn = false;
@@ -30,7 +30,11 @@ export async function middleware(req: NextRequest) {
   }
 
   if (
-    (pathname.startsWith("/dashboard") || pathname.startsWith("/write")) &&
+    (pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/write") ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/bookmarks") ||
+      pathname.startsWith("/notifications")) &&
     !signedIn
   ) {
     const login = new URL("/login", req.url);
@@ -40,5 +44,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/write/:path*", "/admin/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/write/:path*",
+    "/admin/:path*",
+    "/profile/:path*",
+    "/bookmarks/:path*",
+    "/notifications/:path*",
+  ],
 };

@@ -3,7 +3,11 @@
 import { Clock, SearchX, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { clearRecentSearches, getRecentSnapshot } from "@/src/lib/recent-searches";
+import {
+  clearRecentSearches,
+  getRecentSnapshot,
+  getServerSearchesSnapshot,
+} from "@/src/lib/recent-searches";
 import { cx, focusRing } from "@/src/components/ui/shared";
 
 function subscribeToStorage(onChange: () => void): () => void {
@@ -25,7 +29,7 @@ const SUGGESTIONS = [
  * keeps SSR HTML ([]) and hydrated state consistent — no effects needed.
  */
 export function RecentSearches() {
-  const recent = useSyncExternalStore(subscribeToStorage, getRecentSnapshot, () => []);
+  const recent = useSyncExternalStore(subscribeToStorage, getRecentSnapshot, getServerSearchesSnapshot);
   const [cleared, setCleared] = useState(false);
   const visible = cleared ? [] : recent;
 

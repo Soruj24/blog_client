@@ -250,6 +250,21 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
           </div>
           <h1 className="headline mt-4 text-3xl sm:text-4xl">{author.displayName}</h1>
           <p className="mt-1 text-zinc-500 dark:text-zinc-400">@{author.username}</p>
+          {author.title && (
+            <p className="mt-1 text-[15px] font-medium text-zinc-700 dark:text-zinc-300">{author.title}</p>
+          )}
+          {author.expertise && author.expertise.length > 0 && (
+            <ul aria-label="Areas of expertise" className="mt-3 flex flex-wrap gap-2">
+              {author.expertise.map((area) => (
+                <li
+                  key={area}
+                  className="inline-flex h-7 items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+                >
+                  {area}
+                </li>
+              ))}
+            </ul>
+          )}
           {author.bio && (
             <p className="mt-3 max-w-2xl leading-relaxed text-zinc-600 dark:text-zinc-300">
               {author.bio}
@@ -310,7 +325,7 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
         </section>
       )}
 
-      <section aria-labelledby="articles-heading" className="mt-14">
+      <section aria-labelledby="articles-heading" id="author-results" className="mt-14 scroll-mt-24">
         <h2 id="articles-heading" className="headline text-2xl">
           Published articles
         </h2>

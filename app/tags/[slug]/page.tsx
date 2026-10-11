@@ -149,7 +149,7 @@ export default async function TagDetailPage({ params, searchParams }: TagPagePro
         </div>
       ) : (
         <>
-          <div className="mt-8">
+          <div id="tag-results" className="mt-8 scroll-mt-24">
             <PostGrid articles={articles.items} />
           </div>
           <BlogPagination page={articles.page} totalPages={Math.max(1, Math.ceil(articles.total / BLOG_PAGE_SIZE))} />

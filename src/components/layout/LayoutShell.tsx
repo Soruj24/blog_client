@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
+import { PrintThemeGuard } from "./PrintThemeGuard";
 
 /**
  * Root layout wrapper that conditionally renders SiteHeader / SiteFooter.
@@ -18,6 +19,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <PrintThemeGuard />
       <SiteHeader />
       <main id="main-content" className="flex flex-1 flex-col">
         {children}

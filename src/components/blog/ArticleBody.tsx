@@ -11,7 +11,7 @@ export function ArticleBody({ content }: { content: string }) {
     .filter(Boolean);
 
   return (
-    <div className="prose-editorial mt-8 space-y-5">
+    <div className="prose-editorial mt-8 space-y-5 text-pretty">
       {paragraphs.map((p, i) => (
         <p key={i}>{p}</p>
       ))}

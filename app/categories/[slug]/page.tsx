@@ -39,8 +39,8 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
   if (!category) return { title: "Category not found", robots: { index: false, follow: false } };
   const sp = await searchParams;
   const page = Number(Array.isArray(sp["page"]) ? sp["page"][0] : sp["page"]);
-  const title = seoTitle(`${category.name} — Stories & Insights`);
-  const description = seoDescription(category.description || `Browse all ${category.name} stories on Inkwell. Curated articles on ${category.name.toLowerCase()}.`);
+  const title = seoTitle(category.seoTitle || `${category.name} — Stories & Insights`);
+  const description = seoDescription(category.seoDescription || category.description || `Browse all ${category.name} stories on Inkwell. Curated articles on ${category.name.toLowerCase()}.`);
   const path = page && page > 1 ? `/categories/${category.slug}?page=${page}` : `/categories/${category.slug}`;
   return {
     title,
@@ -76,8 +76,6 @@ export default async function CategoryDetailPage({ params, searchParams }: Categ
     featured: false,
     page,
   });
-
-  const url = canonical(`/categories/${category.slug}`);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
@@ -166,7 +164,7 @@ export default async function CategoryDetailPage({ params, searchParams }: Categ
         </div>
       ) : (
         <>
-          <div className="mt-8">
+          <div id="category-results" className="mt-8 scroll-mt-24">
             <PostGrid articles={articles.items} />
           </div>
           <BlogPagination page={articles.page} totalPages={Math.max(1, Math.ceil(articles.total / BLOG_PAGE_SIZE))} />
@@ -174,7 +172,6 @@ export default async function CategoryDetailPage({ params, searchParams }: Categ
       )}
 
       <KeepReading title="Keep reading" excludeCategory={category.slug} />
-      <link rel="canonical" href={url} />
     </div>
   );
 }

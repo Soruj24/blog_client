@@ -21,6 +21,9 @@ export function AuthorCard({ author }: { author: PopularAuthor }) {
         </h3>
       </Link>
       <p className="text-sm text-zinc-500 dark:text-zinc-400">@{author.username}</p>
+      {author.title && (
+        <p className="mt-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">{author.title}</p>
+      )}
       {author.bio && (
         <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
           {author.bio}

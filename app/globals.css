@@ -330,6 +330,28 @@ body {
   }
 }
 
+/* ── Print: article-first output ─────────────────────────────────── */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #18181b !important;
+  }
+
+  /* Long-form uses the full page width on paper. */
+  .prose-editorial {
+    max-width: none;
+  }
+
+  /* Never print skeleton shimmer or shadows. */
+  .animate-pulse {
+    animation: none !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    ADMIN SCROLL SYSTEM
    ═══════════════════════════════════════════════════════════════════ */

@@ -40,6 +40,7 @@ export interface ArticleSummary {
 
 export interface ArticleDetail extends ArticleSummary {
   content: string;
+  updatedAt: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
   canonicalUrl: string | null;
@@ -110,6 +111,9 @@ export interface Category {
   slug: string;
   description: string;
   color: string | null;
+  icon: string;
+  seoTitle: string;
+  seoDescription: string;
   postCount: number;
 }
 
@@ -119,6 +123,9 @@ export interface AdminCategory {
   slug: string;
   description: string;
   color: string | null;
+  icon: string;
+  seoTitle: string;
+  seoDescription: string;
   order: number;
   isActive: boolean;
   postCount: number;
@@ -139,6 +146,9 @@ export interface CategoryInput {
   slug?: string;
   description?: string;
   color?: string | null;
+  icon?: string;
+  seoTitle?: string;
+  seoDescription?: string;
   order?: number;
   isActive?: boolean;
 }
@@ -163,6 +173,8 @@ export interface PopularAuthor {
   _id: string;
   username: string;
   displayName: string;
+  title?: string;
+  expertise?: string[];
   bio: string;
   avatarUrl: string | null;
   postCount: number;
@@ -173,6 +185,8 @@ export interface PopularAuthor {
 export interface AuthorProfile {
   username: string;
   displayName: string;
+  title: string;
+  expertise: string[];
   bio: string;
   avatarUrl: string | null;
   coverUrl: string | null;

@@ -118,7 +118,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 )}
               </h2>
               {articles.total > 0 && (
-                <p className="text-[13px] text-zinc-400 dark:text-zinc-500">
+                <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
                   Titles, bodies, authors & tags
                 </p>
               )}

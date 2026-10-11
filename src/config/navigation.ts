@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   SquarePen,
   User,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ export const PRIMARY_LINKS: NavLink[] = [
   { href: "/", label: "Home", icon: House, match: "exact" },
   { href: "/blog", label: "Explore", icon: Compass, match: "prefix" },
   { href: "/categories", label: "Categories", icon: LayoutGrid, match: "prefix" },
+  { href: "/authors", label: "Authors", icon: Users, match: "prefix" },
   { href: "/trending", label: "Trending", icon: Flame, match: "prefix" },
 ];
 

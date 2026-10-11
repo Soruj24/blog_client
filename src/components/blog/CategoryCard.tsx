@@ -15,13 +15,17 @@ export function CategoryCard({ category }: { category: Category }) {
     >
       <span
         aria-hidden
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl transition-transform duration-200 group-hover:scale-110"
         style={{
           backgroundColor: `${category.color ?? "#71717a"}12`,
           color: category.color ?? "#71717a",
         }}
       >
-        <LayoutGrid className="h-5 w-5" />
+        {category.icon ? (
+          <span aria-hidden>{category.icon}</span>
+        ) : (
+          <LayoutGrid className="h-5 w-5" />
+        )}
       </span>
       <span className="min-w-0">
         <span className="headline block truncate text-lg text-zinc-900 dark:text-zinc-100">

@@ -96,3 +96,27 @@ export function fetchBlogArticles(filters: BlogFilters): Promise<PagedArticles |
 export function fetchAuthorProfile(username: string): Promise<AuthorProfile | null> {
   return get<AuthorProfile>(`/authors/${encodeURIComponent(username.toLowerCase())}`, undefined, 60);
 }
+
+export interface DirectoryAuthor {
+  username: string;
+  displayName: string;
+  title: string;
+  expertise: string[];
+  bio: string;
+  avatarUrl: string | null;
+  location: string | null;
+  followerCount: number;
+  postCount: number;
+}
+
+export interface AuthorDirectory {
+  items: DirectoryAuthor[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/** Full author directory — includes writers with zero posts. Null on failure. */
+export function fetchAuthors(page = 1, limit = 50): Promise<AuthorDirectory | null> {
+  return get<AuthorDirectory>("/authors", { page: String(page), limit: String(limit) }, 300);
+}

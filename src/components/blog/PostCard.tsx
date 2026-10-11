@@ -37,7 +37,7 @@ export const PostCard = memo(function PostCard({ article, highlight }: { article
         {article.coverImage ? (
           <Image
             src={article.coverImage}
-            alt=""
+            alt={article.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
@@ -60,7 +60,7 @@ export const PostCard = memo(function PostCard({ article, highlight }: { article
             {highlight ? <SearchHighlight text={article.title} query={highlight} /> : article.title}
           </Link>
         </h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
           {highlight ? <SearchHighlight text={article.excerpt} query={highlight} /> : article.excerpt}
         </p>
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
@@ -69,7 +69,7 @@ export const PostCard = memo(function PostCard({ article, highlight }: { article
             publishedAt={article.publishedAt}
             readingTime={article.readingTime}
           />
-          <p className="flex shrink-0 items-center gap-3 text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="flex shrink-0 items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
             <span className="inline-flex items-center gap-1" title={`${article.views} views`}>
               <Eye className="h-3.5 w-3.5" aria-hidden />
               {formatCount(article.views)}

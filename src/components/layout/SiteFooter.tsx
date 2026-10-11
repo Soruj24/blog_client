@@ -11,7 +11,7 @@ const ACCOUNT_LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-zinc-200/70 dark:border-zinc-800/70">
+    <footer className="border-t border-zinc-200/70 print:hidden dark:border-zinc-800/70">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
         <div>
           <p className="font-serif text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">

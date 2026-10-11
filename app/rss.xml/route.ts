@@ -23,7 +23,7 @@ export async function GET() {
   }> = [];
 
   try {
-    const res = await fetch(`${API}/articles?limit=50&sort=latest`, { next: { revalidate: 600 } });
+    const res = await fetch(`${API}/articles?limit=30&sort=latest`, { next: { revalidate: 600 } });
     if (res.ok) {
       const json = (await res.json()) as { data: { items: typeof items } | typeof items };
       const data = json.data as unknown;
@@ -46,14 +46,14 @@ export async function GET() {
     <guid isPermaLink="true">${siteUrl}/blog/${escapeXml(a.slug)}</guid>
     <description>${escapeXml(a.excerpt)}</description>
     ${a.publishedAt ? `<pubDate>${new Date(a.publishedAt).toUTCString()}</pubDate>` : ""}
-    ${a.author ? `<author>${escapeXml(a.author.name)}</author>` : ""}
+    ${a.author ? `<dc:creator>${escapeXml(a.author.name)}</dc:creator>` : ""}
     ${a.category ? `<category>${escapeXml(a.category.name)}</category>` : ""}
   </item>`,
     )
     .join("");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>Inkwell — Ideas worth reading slowly</title>
     <link>${siteUrl}/</link>

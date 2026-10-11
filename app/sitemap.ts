@@ -6,6 +6,7 @@ const API = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "
 interface Category { slug: string; updatedAt?: string }
 interface Tag { slug: string }
 interface Author { username: string }
+interface PagedAuthors { items: Author[] }
 interface Article { slug: string; updatedAt?: string; publishedAt?: string | null }
 
 async function getJson<T>(path: string): Promise<T | null> {
@@ -19,31 +20,49 @@ async function getJson<T>(path: string): Promise<T | null> {
   }
 }
 
+function toArray<T>(data: T[] | { items: T[] } | null): T[] {
+  if (Array.isArray(data)) return data;
+  return data?.items ?? [];
+}
+
+/**
+ * Article listing caps `limit` at 30 (see listArticlesSchema), so page
+ * through the feed instead of requesting 100 at once (which 400s and
+ * silently yields zero article URLs).
+ */
+async function getAllArticles(): Promise<Article[]> {
+  const PAGE_SIZE = 30;
+  const MAX_PAGES = 50; // 1,500 URLs — raise with a sitemap index if exceeded
+  const out: Article[] = [];
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const data = await getJson<Article[] | { items: Article[] }>(
+      `/articles?limit=${PAGE_SIZE}&page=${page}&sort=latest`,
+    );
+    const items = toArray(data);
+    out.push(...items);
+    if (items.length < PAGE_SIZE) break;
+  }
+  return out;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // NOTE: /search is intentionally excluded — the page is noindex,follow.
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/blog`, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/categories`, changeFrequency: "daily", priority: 0.7 },
     { url: `${SITE_URL}/tags`, changeFrequency: "daily", priority: 0.6 },
-    { url: `${SITE_URL}/search`, changeFrequency: "weekly", priority: 0.5 },
   ];
 
   const [articles, categories, tags, authors] = await Promise.all([
-    getJson<Article[]>("/articles?limit=100&sort=latest"),
+    getAllArticles(),
     getJson<Category[]>("/categories"),
-    getJson<Tag[]>("/tags?limit=100"),
-    // authors come from profiles with published posts; fallback to empty
-    getJson<Author[]>("/users/authors/popular?limit=50"),
+    getJson<Tag[]>("/tags"),
+    // Full directory (includes zero-post writers), not the top-12 leaderboard.
+    getJson<Author[] | PagedAuthors>("/authors?limit=50"),
   ]);
 
-  // Articles may be paginated object; handle both shapes
-  let articleEntries: Article[] = [];
-  if (Array.isArray(articles)) articleEntries = articles;
-  else if (articles && typeof articles === "object" && "items" in (articles as Record<string, unknown>)) {
-    articleEntries = (articles as unknown as { items: Article[] }).items ?? [];
-  }
-
-  const articleUrls: MetadataRoute.Sitemap = articleEntries.map((a) => ({
+  const articleUrls: MetadataRoute.Sitemap = articles.map((a) => ({
     url: `${SITE_URL}/blog/${a.slug}`,
     lastModified: a.updatedAt ? new Date(a.updatedAt) : a.publishedAt ? new Date(a.publishedAt) : undefined,
     changeFrequency: "weekly",
@@ -56,13 +75,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const tagUrls: MetadataRoute.Sitemap = (tags ?? []).map((t) => ({
+  const tagUrls: MetadataRoute.Sitemap = toArray(tags).map((t) => ({
     url: `${SITE_URL}/tags/${t.slug}`,
     changeFrequency: "weekly",
     priority: 0.5,
   }));
 
-  const authorUrls: MetadataRoute.Sitemap = (authors ?? []).map((a) => ({
+  const authorUrls: MetadataRoute.Sitemap = toArray(authors).map((a) => ({
     url: `${SITE_URL}/author/${a.username}`,
     changeFrequency: "weekly",
     priority: 0.6,

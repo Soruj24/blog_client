@@ -48,6 +48,10 @@ const NewsletterSection = dynamic(
   () => import("@/src/components/home/NewsletterSection").then((m) => m.NewsletterSection)
 );
 
+const RecentlyViewedSection = dynamic(
+  () => import("@/src/components/blog/RecentlyViewedSection").then((m) => m.RecentlyViewedSection)
+);
+
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -100,6 +104,7 @@ export default function Home() {
       <HeroSection />
       <FeaturedSection />
       <LatestSection />
+      <RecentlyViewedSection />
       <TrendingSection />
       <CategoriesSection />
       <EditorsPicksSection />
