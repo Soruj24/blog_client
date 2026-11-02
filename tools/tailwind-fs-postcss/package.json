@@ -1,0 +1,8 @@
+{
+  "name": "tailwind-fs-postcss",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tailwind CSS v4 PostCSS plugin with a Node fs scanning fallback for machines where the native oxide binding is blocked.",
+  "main": "index.cjs",
+  "license": "MIT"
+}

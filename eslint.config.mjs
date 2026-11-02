@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build tooling: CommonJS by design (loaded by PostCSS/Next before ESM).
+    "tools/**",
+    "scripts/**",
   ]),
 ]);
 
