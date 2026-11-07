@@ -59,7 +59,7 @@ interface AIAssistantProps {
 const ACTIONS: Array<{ key: ActionKey; label: string; icon: typeof Sparkles; desc: string; needsContent?: boolean }> = [
   { key: "title", label: "Title", icon: Type, desc: "Generate title from topic" },
   { key: "outline", label: "Outline", icon: ListTree, desc: "Generate outline" },
-  { key: "article", label: "Article", icon: FileText, desc: "Deep agent draft (LangGraph + Ollama)" },
+  { key: "article", label: "Article", icon: FileText, desc: "AI draft article (streaming)" },
   { key: "rewrite", label: "Rewrite", icon: PenLine, desc: "Rewrite content", needsContent: true },
   { key: "grammar", label: "Grammar", icon: Languages, desc: "Improve grammar", needsContent: true },
   { key: "summarize", label: "Summarize", icon: AlignLeft, desc: "Summarize", needsContent: true },
@@ -142,7 +142,7 @@ export function AIAssistant({ title, excerpt, content, onApply }: AIAssistantPro
             } catch {}
           }
         }
-        setCost({ total: Math.ceil(full.length / 4), hint: "Streaming · Ollama Gemma" });
+        setCost({ total: Math.ceil(full.length / 4), hint: "Streaming · OpenRouter" });
         setStreaming(false);
         return;
       }
@@ -241,7 +241,7 @@ export function AIAssistant({ title, excerpt, content, onApply }: AIAssistantPro
           </div>
           <div>
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">AI Assistant</h2>
-            <p className="text-[11px] text-zinc-400">Gemma · LangGraph · Streaming</p>
+            <p className="text-[11px] text-zinc-400">OpenRouter · Streaming</p>
           </div>
         </div>
       </div>
